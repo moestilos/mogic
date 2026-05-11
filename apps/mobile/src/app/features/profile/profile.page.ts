@@ -7,6 +7,7 @@ import { ProfileStore } from '../../core/stores/profile.store';
 import { HapticsService } from '../../core/services/haptics.service';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
+import { PlayerCardComponent } from '../../shared/player-card.component';
 import { AVATAR_ICONS, type IconKey } from '../../shared/icons';
 
 const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
@@ -14,7 +15,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [IonContent, LowerCasePipe, NgClass, AnimatedBackgroundComponent, IconComponent],
+  imports: [IonContent, LowerCasePipe, NgClass, AnimatedBackgroundComponent, IconComponent, PlayerCardComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
       <div class="min-h-screen px-6 md:px-12 lg:px-24 pt-[max(env(safe-area-inset-top),2rem)] pb-[max(env(safe-area-inset-bottom),2rem)] max-w-3xl mx-auto relative"
@@ -55,7 +56,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
           </div>
 
           @if (tab() === 'friends') {
-            <div class="space-y-2 mb-6 relative z-10">
+            <div class="mb-6 relative z-10">
               @if (store.friends().length === 0) {
                 <div class="crown-card text-center p-8">
                   <crown-icon name="Users" [size]="40" [strokeWidth]="1.25" cls="crown-text-lo"></crown-icon>
@@ -63,23 +64,26 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                   <p class="crown-text-lo text-xs">Añade los compañeros de mesa abajo</p>
                 </div>
               }
-              @for (f of store.friends(); track f.id) {
-                <div class="crown-card flex items-center gap-3 p-3">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: var(--bg-input);">
-                    <crown-icon [name]="$any(f.avatar)" [size]="20" cls="crown-text-hi"></crown-icon>
-                  </div>
-                  <div class="crown-pip" [ngClass]="f.color | lowercase"></div>
-                  <div class="flex-1 min-w-0">
-                    <div class="truncate" style="font-family: var(--font-name); font-weight: 600;">{{ f.name }}</div>
-                    <div class="crown-text-lo text-xs flex gap-3 mt-0.5" style="font-family: var(--font-hud);">
-                      <span><span class="crown-text-hi">{{ f.wins }}</span>W</span>
-                      <span><span class="crown-text-hi">{{ f.games }}</span>G</span>
-                      <span><span class="crown-text-hi">{{ winRate(f.wins, f.games) }}</span>%</span>
+              @if (store.friends().length > 0) {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  @for (f of sortedFriends(); track f.id; let i = $index) {
+                    <div class="relative">
+                      <player-card
+                        size="md"
+                        [data]="{
+                          name: f.name,
+                          color: f.color,
+                          avatar: $any(f.avatar),
+                          wins: f.wins,
+                          games: f.games,
+                          rank: i + 1
+                        }"></player-card>
+                      <button class="crown-btn-ghost absolute top-2 left-2 z-10 px-2 py-1"
+                              (click)="remove(f.id)" aria-label="Eliminar amigo">
+                        <crown-icon name="Trash2" [size]="13"></crown-icon>
+                      </button>
                     </div>
-                  </div>
-                  <button class="crown-btn-ghost px-2" (click)="remove(f.id)" aria-label="Eliminar amigo">
-                    <crown-icon name="Trash2" [size]="16"></crown-icon>
-                  </button>
+                  }
                 </div>
               }
             </div>
@@ -135,21 +139,20 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
             </div>
 
             @if (topFriend(); as top) {
-              <div class="crown-card mt-4 p-5 relative z-10"
-                   [style.border-color]="'var(--accent-flat)'"
-                   [style.box-shadow]="'var(--accent-glow)'">
+              <div class="mt-5 relative z-10">
                 <div class="crown-hud crown-text-accent mb-2 flex items-center gap-2">
                   <crown-icon name="Trophy" [size]="14"></crown-icon> King of the table
                 </div>
-                <div class="flex items-center gap-4">
-                  <div class="w-14 h-14 rounded-full flex items-center justify-center" style="background: var(--bg-input);">
-                    <crown-icon [name]="$any(top.avatar)" [size]="28" cls="crown-text-accent"></crown-icon>
-                  </div>
-                  <div>
-                    <div class="crown-display text-2xl">{{ top.name }}</div>
-                    <div class="crown-text-lo text-xs" style="font-family: var(--font-hud);">{{ top.wins }} wins · {{ winRate(top.wins, top.games) }}% rate</div>
-                  </div>
-                </div>
+                <player-card
+                  size="lg"
+                  [data]="{
+                    name: top.name,
+                    color: top.color,
+                    avatar: $any(top.avatar),
+                    wins: top.wins,
+                    games: top.games,
+                    rank: 1
+                  }"></player-card>
               </div>
             }
           }
@@ -182,6 +185,12 @@ export class ProfilePage implements OnInit {
   topFriend() {
     const friends = [...this.store.friends()].sort((a, b) => b.wins - a.wins);
     return friends[0]?.games ? friends[0] : null;
+  }
+  sortedFriends() {
+    return [...this.store.friends()].sort((a, b) => {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return b.games - a.games;
+    });
   }
 
   async add() {

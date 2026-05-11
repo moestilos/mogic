@@ -8,6 +8,7 @@ import { GameStore } from '../../core/stores/game.store';
 import { HapticsService } from '../../core/services/haptics.service';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
+import { PlayerCardComponent } from '../../shared/player-card.component';
 import type { IconKey } from '../../shared/icons';
 
 const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
@@ -15,7 +16,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 @Component({
   selector: 'app-group-detail',
   standalone: true,
-  imports: [IonContent, NgClass, LowerCasePipe, AnimatedBackgroundComponent, IconComponent],
+  imports: [IonContent, NgClass, LowerCasePipe, AnimatedBackgroundComponent, IconComponent, PlayerCardComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
       <div class="min-h-screen px-6 md:px-12 lg:px-24 pt-[max(env(safe-area-inset-top),2rem)] pb-[max(env(safe-area-inset-bottom),6rem)] max-w-5xl mx-auto relative"
@@ -65,32 +66,19 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 }
               </div>
             } @else {
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 relative z-10">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3 relative z-10">
                 @for (s of standings(); track s.profileId; let i = $index) {
-                  <div class="crown-card flex items-center gap-4 p-4"
-                       [style.border-color]="i === 0 ? 'var(--accent-flat)' : null"
-                       [style.box-shadow]="i === 0 ? 'var(--accent-glow)' : null">
-                    <div class="text-3xl w-10 text-center"
-                         [class]="rankColor(i)"
-                         style="font-family: var(--font-life); font-weight: var(--life-weight); letter-spacing: -0.04em;">{{ i + 1 }}</div>
-                    <div class="crown-color-swatch is-on" [ngClass]="s.color | lowercase" style="width:28px;height:28px;"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="crown-text-hi truncate" style="font-family: var(--font-name); font-weight: 500;">{{ s.name }}</div>
-                      <div class="crown-text-lo text-xs flex gap-3 mt-0.5" style="font-family: var(--font-hud);">
-                        <span>{{ s.wins }}W / {{ s.games }}G</span>
-                        <span>{{ (s.winRate * 100).toFixed(0) }}%</span>
-                        @if (s.currentStreak > 1) {
-                          <span class="crown-text-danger inline-flex items-center gap-0.5">
-                            <crown-icon name="Flame" [size]="10"></crown-icon>{{ s.currentStreak }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <div class="crown-hud text-[9px]">Avg</div>
-                      <div class="text-lg" style="font-family: var(--font-hud); font-variant-numeric: tabular-nums;">{{ s.avgPlacement.toFixed(1) }}</div>
-                    </div>
-                  </div>
+                  <player-card
+                    size="md"
+                    [data]="{
+                      name: s.name,
+                      color: s.color,
+                      avatar: $any(profileAvatar(s.profileId)),
+                      wins: s.wins,
+                      games: s.games,
+                      streak: s.currentStreak,
+                      rank: i + 1
+                    }"></player-card>
                 }
               </div>
             }
@@ -240,6 +228,11 @@ export class GroupDetailPage implements OnInit {
     if (!raw) return 'Crown';
     if (raw.length > 4) return raw as IconKey;
     return 'Crown';
+  }
+
+  profileAvatar(profileId: string): IconKey {
+    const p = this.group()?.profiles.find((pr) => pr.id === profileId);
+    return (p?.avatar as IconKey) ?? 'User';
   }
 
   back() { void this.router.navigate(['/groups']); }
