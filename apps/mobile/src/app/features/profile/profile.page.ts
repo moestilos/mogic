@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { LowerCasePipe, NgClass } from '@angular/common';
+import type { ManaColor } from '@crown/game-engine';
 import { ProfileStore } from '../../core/stores/profile.store';
 import { AuthStore } from '../../core/stores/auth.store';
 import { FriendRequestsStore } from '../../core/stores/friend-requests.store';
@@ -9,6 +10,9 @@ import { HapticsService } from '../../core/services/haptics.service';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
 import { PlayerCardComponent } from '../../shared/player-card.component';
+import { AVATAR_ICONS, type IconKey } from '../../shared/icons';
+
+const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 
 @Component({
   selector: 'app-profile',
@@ -48,6 +52,9 @@ import { PlayerCardComponent } from '../../shared/player-card.component';
                   </div>
                 </div>
               </div>
+              <button class="profile-icon-btn" (click)="openEdit()" aria-label="Editar perfil">
+                <crown-icon name="Settings" [size]="16"></crown-icon>
+              </button>
             </div>
 
             <div class="profile-hero-stats">
@@ -330,6 +337,108 @@ import { PlayerCardComponent } from '../../shared/player-card.component';
           }
         }
       </div>
+
+      <!-- EDIT PROFILE MODAL -->
+      @if (editOpen()) {
+        <div class="fixed inset-0 z-[70] flex items-end md:items-center justify-center" (click)="closeEdit()">
+          <div class="edit-backdrop"></div>
+          <div class="edit-modal" (click)="$event.stopPropagation()">
+
+            <div class="edit-header">
+              <div>
+                <div class="edit-eyebrow">Editar perfil</div>
+                <div class="edit-title">Tu cuenta</div>
+              </div>
+              <button class="edit-icon-btn" (click)="closeEdit()" aria-label="Cerrar">
+                <crown-icon name="X" [size]="18"></crown-icon>
+              </button>
+            </div>
+
+            <!-- Tabs edit -->
+            <div class="edit-tabs">
+              <button class="edit-tab" [class.is-on]="editTab() === 'identity'" (click)="editTab.set('identity')">Identidad</button>
+              <button class="edit-tab" [class.is-on]="editTab() === 'account'" (click)="editTab.set('account')">Cuenta</button>
+              <button class="edit-tab" [class.is-on]="editTab() === 'password'" (click)="editTab.set('password')">Contraseña</button>
+            </div>
+
+            @if (editTab() === 'identity') {
+              <div class="edit-section">
+                <label class="edit-label">Nombre visible</label>
+                <input class="edit-input" [value]="editName()" (input)="editName.set($any($event.target).value)" maxlength="20" />
+
+                <label class="edit-label">Color principal</label>
+                <div class="flex gap-1.5 flex-wrap mb-3">
+                  @for (c of colors; track c) {
+                    <button class="crown-color-swatch"
+                            [ngClass]="(c | lowercase)"
+                            [class.is-on]="editColor() === c"
+                            (click)="editColor.set(c)"
+                            [attr.aria-label]="c"></button>
+                  }
+                </div>
+
+                <label class="edit-label">Avatar</label>
+                <div class="grid grid-cols-6 gap-1.5 max-h-[32vh] overflow-y-auto pr-1 mb-2">
+                  @for (a of avatars; track a) {
+                    <button class="aspect-square flex items-center justify-center edit-avatar-btn"
+                            [class.is-on]="editAvatar() === a"
+                            (click)="editAvatar.set(a)">
+                      <crown-icon [name]="$any(a)" [size]="18"></crown-icon>
+                    </button>
+                  }
+                </div>
+              </div>
+              <button class="edit-cta" (click)="saveIdentity()">
+                <crown-icon name="Check" [size]="14"></crown-icon> Guardar identidad
+              </button>
+            }
+
+            @if (editTab() === 'account') {
+              <div class="edit-section">
+                <label class="edit-label">Usuario (&#64;)</label>
+                <input class="edit-input" [value]="editUsername()" (input)="editUsername.set($any($event.target).value)" maxlength="24" placeholder="solo_letras_numeros" autocapitalize="off" />
+                <p class="edit-hint">Solo letras minúsculas, números y guión bajo</p>
+
+                <label class="edit-label">Email</label>
+                <input class="edit-input" [value]="editEmail()" (input)="editEmail.set($any($event.target).value)" type="email" autocomplete="email" inputmode="email" />
+
+                <label class="edit-label">Contraseña actual (requerida para email)</label>
+                <input class="edit-input" [value]="editEmailPass()" (input)="editEmailPass.set($any($event.target).value)" type="password" autocomplete="current-password" />
+              </div>
+              <button class="edit-cta" (click)="saveAccount()">
+                <crown-icon name="Check" [size]="14"></crown-icon> Guardar cuenta
+              </button>
+            }
+
+            @if (editTab() === 'password') {
+              <div class="edit-section">
+                <label class="edit-label">Contraseña actual</label>
+                <input class="edit-input" [value]="pwCurrent()" (input)="pwCurrent.set($any($event.target).value)" type="password" autocomplete="current-password" />
+
+                <label class="edit-label">Contraseña nueva</label>
+                <input class="edit-input" [value]="pwNew()" (input)="pwNew.set($any($event.target).value)" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" />
+
+                <label class="edit-label">Confirmar nueva</label>
+                <input class="edit-input" [value]="pwConfirm()" (input)="pwConfirm.set($any($event.target).value)" type="password" autocomplete="new-password" />
+              </div>
+              <button class="edit-cta" (click)="savePassword()">
+                <crown-icon name="Lock" [size]="14"></crown-icon> Cambiar contraseña
+              </button>
+            }
+
+            @if (editError()) {
+              <div class="edit-error">
+                <crown-icon name="X" [size]="13"></crown-icon> {{ editError() }}
+              </div>
+            }
+            @if (editSuccess()) {
+              <div class="edit-success">
+                <crown-icon name="Check" [size]="13"></crown-icon> {{ editSuccess() }}
+              </div>
+            }
+          </div>
+        </div>
+      }
     </ion-content>
   `,
   styles: [`
@@ -569,6 +678,163 @@ import { PlayerCardComponent } from '../../shared/player-card.component';
       letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--text-lo); margin-top: 5px;
     }
+
+    /* Edit profile modal — self-contained dark styles */
+    .edit-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 0;
+    }
+    .edit-modal {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 32rem; max-height: 92vh;
+      overflow-y: auto;
+      padding: 22px;
+      background: #0c0c12;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px 22px 0 0;
+      color: #e8e8f0;
+      margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      .edit-modal { border-radius: 22px; margin-bottom: 2rem; }
+    }
+    .edit-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .edit-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #7a7a90;
+    }
+    .edit-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: #f5f5fa;
+      margin-top: 4px;
+    }
+    .edit-icon-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #c4c4d0;
+      cursor: pointer;
+    }
+    .edit-icon-btn:hover { background: rgba(255,255,255,0.1); }
+    .edit-tabs {
+      display: flex; gap: 4px; padding: 4px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .edit-tab {
+      flex: 1; padding: 9px 6px;
+      background: transparent;
+      border: none;
+      color: #9999a8;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+    }
+    .edit-tab:hover { color: #c4c4d0; }
+    .edit-tab.is-on { background: rgba(255,255,255,0.1); color: #f5f5fa; }
+    .edit-section { margin-bottom: 14px; }
+    .edit-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #7a7a90;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    .edit-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #f5f5fa;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 160ms ease;
+    }
+    .edit-input:focus { border-color: #b39dff; }
+    .edit-input::placeholder { color: #6e6e7e; }
+    .edit-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: #6e6e7e;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    .edit-avatar-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #c4c4d0;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+    .edit-avatar-btn:hover { background: rgba(255,255,255,0.08); }
+    .edit-avatar-btn.is-on {
+      background: rgba(179,157,255,0.15);
+      border-color: #b39dff;
+      color: #fff;
+    }
+    .edit-cta {
+      width: 100%;
+      padding: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(115deg, #ff9ed0, #b39dff, #9dd2ff, #9dffb3, #ffe89d);
+      background-size: 300% 100%;
+      color: #08080a;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      animation: chromeFlow 5s linear infinite;
+    }
+    .edit-cta:active { transform: scale(0.98); }
+    .edit-error {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(255,122,122,0.1);
+      border: 1px solid rgba(255,122,122,0.4);
+      border-radius: 10px;
+      color: #ff9e9e;
+      font-size: 13px;
+    }
+    .edit-success {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(157,255,179,0.1);
+      border: 1px solid rgba(157,255,179,0.4);
+      border-radius: 10px;
+      color: #9dffb3;
+      font-size: 13px;
+    }
   `],
 })
 export class ProfilePage implements OnInit {
@@ -581,6 +847,23 @@ export class ProfilePage implements OnInit {
   readonly tab = signal<'friends' | 'requests' | 'search' | 'stats'>('friends');
   readonly searchQuery = signal('');
   readonly errorMsg = signal<string | null>(null);
+
+  // Edit profile modal state
+  readonly colors = COLORS;
+  readonly avatars = AVATAR_ICONS;
+  readonly editOpen = signal(false);
+  readonly editTab = signal<'identity' | 'account' | 'password'>('identity');
+  readonly editName = signal('');
+  readonly editColor = signal<ManaColor>('U');
+  readonly editAvatar = signal<IconKey>('Crown');
+  readonly editUsername = signal('');
+  readonly editEmail = signal('');
+  readonly editEmailPass = signal('');
+  readonly pwCurrent = signal('');
+  readonly pwNew = signal('');
+  readonly pwConfirm = signal('');
+  readonly editError = signal<string | null>(null);
+  readonly editSuccess = signal<string | null>(null);
 
   readonly totalGames = computed(() =>
     this.store.friends().reduce((max, f) => Math.max(max, f.games), 0)
@@ -662,4 +945,99 @@ export class ProfilePage implements OnInit {
   }
 
   back() { void this.router.navigate(['/']); }
+
+  // ── Edit profile ────────────────────────────────────────
+  openEdit() {
+    void this.haptics.medium();
+    const me = this.auth.me();
+    if (!me) return;
+    this.editName.set(me.displayName);
+    this.editColor.set(me.color);
+    this.editAvatar.set(me.avatar as IconKey);
+    this.editUsername.set(me.username);
+    this.editEmail.set(me.email);
+    this.editEmailPass.set('');
+    this.pwCurrent.set('');
+    this.pwNew.set('');
+    this.pwConfirm.set('');
+    this.editError.set(null);
+    this.editSuccess.set(null);
+    this.editTab.set('identity');
+    this.editOpen.set(true);
+  }
+
+  closeEdit() {
+    this.editOpen.set(false);
+  }
+
+  private clearMessages() {
+    this.editError.set(null);
+    this.editSuccess.set(null);
+  }
+
+  async saveIdentity() {
+    this.clearMessages();
+    const me = this.auth.me();
+    if (!me) return;
+    const name = this.editName().trim();
+    if (name.length < 2) { this.editError.set('Nombre mínimo 2 caracteres'); void this.haptics.error(); return; }
+    await this.auth.updateProfile({
+      displayName: name,
+      color: this.editColor(),
+      avatar: this.editAvatar(),
+    });
+    // Mirror al ProfileStore para consistencia
+    await this.store.updateProfile({ name, color: this.editColor(), avatar: this.editAvatar() });
+    void this.haptics.success();
+    this.editSuccess.set('Identidad actualizada');
+  }
+
+  async saveAccount() {
+    this.clearMessages();
+    const me = this.auth.me();
+    if (!me) return;
+    const newUsername = this.editUsername().trim();
+    const newEmail = this.editEmail().trim();
+    let changedAny = false;
+
+    if (newUsername !== me.username) {
+      const { error } = await this.auth.changeUsername(newUsername);
+      if (error) { this.editError.set(error); void this.haptics.error(); return; }
+      changedAny = true;
+    }
+    if (newEmail !== me.email) {
+      if (this.editEmailPass().length < 1) {
+        this.editError.set('Necesitas tu contraseña actual para cambiar el email');
+        void this.haptics.error();
+        return;
+      }
+      const { error } = await this.auth.changeEmail(newEmail, this.editEmailPass());
+      if (error) { this.editError.set(error); void this.haptics.error(); return; }
+      changedAny = true;
+      this.editEmailPass.set('');
+    }
+    if (!changedAny) {
+      this.editError.set('No has cambiado nada');
+      return;
+    }
+    void this.haptics.success();
+    this.editSuccess.set('Cuenta actualizada');
+  }
+
+  async savePassword() {
+    this.clearMessages();
+    const cur = this.pwCurrent();
+    const nw = this.pwNew();
+    const cf = this.pwConfirm();
+    if (cur.length < 1) { this.editError.set('Introduce tu contraseña actual'); void this.haptics.error(); return; }
+    if (nw.length < 6) { this.editError.set('Nueva contraseña mínimo 6 caracteres'); void this.haptics.error(); return; }
+    if (nw !== cf) { this.editError.set('Las contraseñas nuevas no coinciden'); void this.haptics.error(); return; }
+    const { error } = await this.auth.changePassword(cur, nw);
+    if (error) { this.editError.set(error); void this.haptics.error(); return; }
+    this.pwCurrent.set('');
+    this.pwNew.set('');
+    this.pwConfirm.set('');
+    void this.haptics.success();
+    this.editSuccess.set('Contraseña actualizada');
+  }
 }
