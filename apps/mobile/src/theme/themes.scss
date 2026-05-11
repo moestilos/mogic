@@ -521,10 +521,73 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
 }
 [data-theme='brutal'] .crown-pod.is-active .crown-pip { filter: invert(1) brightness(0.4); }
 
-/* ── SIGIL — tarot card pod (paper + ink frame + roman cap + foot title) ─ */
-[data-theme='sigil'] .crown-pod {
-  background:
-    radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
+/* SIGIL original — gold glide bar at left */
+[data-theme='sigil'] .crown-pod { border-left: none; border-right: none; }
+[data-theme='sigil'] .crown-pod.is-active { border-color: var(--accent); }
+[data-theme='sigil'] .crown-pod.is-active::before {
+  content: '';
+  position: absolute;
+  top: -1px; bottom: -1px;
+  left: 0; width: 2px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  animation: sigilGlide 3s ease-in-out infinite;
+  pointer-events: none;
+}
+[data-theme='sigil'] .crown-pod.is-active .crown-pod-life {
+  color: var(--accent-flat);
+  text-shadow: 0 0 24px rgba(201, 162, 86, 0.5);
+}
+
+/* ── CARDS — Tarot Card Sigil template (faithful to template VII) ──
+   New dedicated theme. Different from sigil. */
+[data-theme='cards'] {
+  --bg-base: radial-gradient(120% 80% at 50% 0%, #14101e, #0a0710 60%), #0a0710;
+  --bg-elevated: #14101e;
+  --bg-pod: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
+  --bg-pod-border: #3a2818;
+  --bg-input: rgba(201,162,86,0.04);
+  --modal-backdrop: rgba(10,7,16,0.88);
+  --divider: rgba(201,162,86,0.18);
+
+  --text-hi: #efe5cc;
+  --text-mid: #b8a98c;
+  --text-lo: #8a6a2a;
+
+  --accent: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a);
+  --accent-flat: #c9a256;
+  --accent-text: #0a0710;
+  --accent-glow: 0 0 32px rgba(255, 158, 70, 0.3);
+  --danger: #6b1d22;
+  --danger-bg: rgba(107,29,34,0.15);
+  --warn: #e8c576;
+  --success: #b8c860;
+
+  --pod-radius: 4px;
+  --pod-border-width: 1px;
+  --btn-radius: 3px;
+  --input-radius: 2px;
+  --tag-radius: 0px;
+  --modal-radius: 4px;
+
+  --font-name: 'Cinzel', serif;
+  --font-life: 'Cormorant Garamond', serif;
+  --font-hud: 'Cinzel', serif;
+  --font-btn: 'Cinzel', serif;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --life-weight: 300;
+  --life-letter: -0.05em;
+  --hud-letter: 0.42em;
+  --hud-color: #c9a256;
+  --grain-opacity: 0.04;
+}
+
+[data-theme='cards'] body { color: #efe5cc; }
+[data-theme='cards'] ion-content { --background: var(--bg-base); --color: var(--text-hi); }
+
+/* Pod = TAROT CARD */
+[data-theme='cards'] .crown-pod {
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
   border: 1px solid rgba(0,0,0,0.4) !important;
   border-radius: 4px !important;
   color: #1a1108;
@@ -536,8 +599,8 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 600ms;
   padding: 14px 10px 10px !important;
 }
-/* Paper grain inside card */
-[data-theme='sigil'] .crown-pod::after {
+/* Paper grain multiply */
+[data-theme='cards'] .crown-pod::after {
   content: '';
   position: absolute; inset: 0;
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0 0.2  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
@@ -545,17 +608,17 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   pointer-events: none; z-index: 0;
 }
 /* Double ink frame */
-[data-theme='sigil'] .crown-pod::before {
+[data-theme='cards'] .crown-pod::before {
   content: '';
   position: absolute; inset: 4px;
   border: 1px solid #3a2818;
   border-radius: 2px;
   pointer-events: none; z-index: 1;
 }
-[data-theme='sigil'] .crown-pod-stripe { display: none; }
+[data-theme='cards'] .crown-pod-stripe { display: none; }
 
-/* Active state: lift + gold halo + breath */
-[data-theme='sigil'] .crown-pod.is-active {
+/* Active = lift + gold halo breath */
+[data-theme='cards'] .crown-pod.is-active {
   transform: translateY(-4px) rotate(-0.6deg);
   box-shadow:
     0 0 0 1px #8a6a2a,
@@ -565,21 +628,25 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
     0 0 64px rgba(201, 162, 86, 0.18);
   z-index: 5;
 }
-[data-theme='sigil'] .crown-pod.is-active::before {
+[data-theme='cards'] .crown-pod.is-active::before {
   border-color: #8a6a2a;
-  /* segundo frame interior */
   box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256;
+  animation: cardsCandle 3.2s ease-in-out infinite;
 }
-[data-theme='sigil'] .crown-pod.is-active .crown-pod-life {
-  color: #1a1108;
+@keyframes cardsCandle {
+  0%, 100% { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256; }
+  50%      { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #e8c576; }
 }
-[data-theme='sigil'] .crown-pod-life {
+
+/* Life numeral handset, ink color */
+[data-theme='cards'] .crown-pod-life {
   font-family: 'Cormorant Garamond', serif !important;
   font-weight: 300 !important;
   letter-spacing: -0.05em !important;
   color: #1a1108 !important;
 }
-[data-theme='sigil'] .crown-pod-name {
+/* Name Cinzel small caps */
+[data-theme='cards'] .crown-pod-name {
   font-family: 'Cinzel', serif !important;
   font-weight: 600 !important;
   font-size: 10px !important;
@@ -589,38 +656,23 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   text-align: center !important;
 }
 
-/* Counter strip footer inside sigil card */
-[data-theme='sigil'] .crown-pod {
-  /* hint: text-color counters via theme color overrides */
-}
-
-/* OUT face-down */
-[data-theme='sigil'] .crown-pod.is-out {
+/* OUT face-down crosshatch */
+[data-theme='cards'] .crown-pod.is-out {
   transform: rotate(2deg);
   filter: grayscale(0.4);
   opacity: 0.85;
 }
-[data-theme='sigil'] .crown-pod.is-out::after {
-  /* Crosshatch back overlay */
+[data-theme='cards'] .crown-pod.is-out::after {
   background-image:
     url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0 0.2  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
     repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(58,40,24,0.15) 6px, rgba(58,40,24,0.15) 7px);
   opacity: 1;
   mix-blend-mode: normal;
 }
-[data-theme='sigil'] .crown-pod.is-out .crown-pod-life,
-[data-theme='sigil'] .crown-pod.is-out .crown-pod-name { display: none; }
+[data-theme='cards'] .crown-pod.is-out .crown-pod-life,
+[data-theme='cards'] .crown-pod.is-out .crown-pod-name { display: none; }
 
-/* Candle breath halo behind active card */
-[data-theme='sigil'] .crown-pod.is-active::before {
-  animation: sigilCandle 3.2s ease-in-out infinite;
-}
-@keyframes sigilCandle {
-  0%, 100% { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256; }
-  50%      { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #e8c576; }
-}
-
-/* Roman cap (only sigil) */
+/* Roman cap top center — only visible on cards theme */
 .crown-pod-cap {
   position: absolute;
   top: -1px; left: 50%;
@@ -635,7 +687,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   z-index: 6;
   pointer-events: none;
 }
-[data-theme='sigil'] .crown-pod-cap {
+[data-theme='cards'] .crown-pod-cap {
   display: flex;
   background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9);
   border: 1px solid #3a2818;
@@ -644,42 +696,37 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   border-bottom-right-radius: 8px;
   color: #3a2818;
 }
-[data-theme='sigil'] .crown-pod.is-active .crown-pod-cap {
+[data-theme='cards'] .crown-pod.is-active .crown-pod-cap {
   background: linear-gradient(180deg, #e8c576, #c9a256);
   border-color: #8a6a2a;
   color: #1a1108;
 }
 
-/* Avatar+pip dark inside sigil card */
-[data-theme='sigil'] .crown-pod .crown-pod-name { color: #1a1108 !important; }
-[data-theme='sigil'] .crown-pod [style*="background: rgba(255,255,255,0.06)"] {
+/* Avatar+pip ink overrides on cards */
+[data-theme='cards'] .crown-pod [style*="background: rgba(255,255,255,0.06)"] {
   background: rgba(58,40,24,0.08) !important;
   border-color: #3a2818 !important;
   color: #3a2818 !important;
 }
-[data-theme='sigil'] .crown-pod .crown-pip {
+[data-theme='cards'] .crown-pod .crown-pip {
   box-shadow: 0 0 0 1px #3a2818;
 }
-
-/* Counters strip on sigil paper bg → ink color */
-[data-theme='sigil'] .crown-pod > div > div:last-child {
+[data-theme='cards'] .crown-pod > div > div:last-child {
   color: #6a523a !important;
   font-family: 'Cormorant Garamond', serif !important;
   font-style: italic !important;
   font-size: 11px !important;
   letter-spacing: 0.02em !important;
 }
-
-/* Hold hint dark on paper */
-[data-theme='sigil'] .crown-pod button[aria-label='Open counters'] {
+[data-theme='cards'] .crown-pod button[aria-label='Open counters'] {
   background: rgba(58,40,24,0.08) !important;
   border-color: rgba(58,40,24,0.3) !important;
   color: #3a2818 !important;
 }
 
-/* Bottom action bar on sigil = mini cards */
-[data-theme='sigil'] body .crown-btn,
-[data-theme='sigil'] body .crown-btn-primary {
+/* Bottom action bar = mini cards */
+[data-theme='cards'] body .crown-btn,
+[data-theme='cards'] body .crown-btn-primary {
   background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
   border: 1px solid #3a2818;
   color: #1a1108;
@@ -695,7 +742,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
     0 2px 0 rgba(0,0,0,0.3),
     0 6px 12px rgba(0,0,0,0.35);
 }
-[data-theme='sigil'] body .crown-btn-primary {
+[data-theme='cards'] body .crown-btn-primary {
   background: radial-gradient(140% 100% at 50% 0%, #e8c576, #c9a256 60%, #8a6a2a);
   border-color: #8a6a2a;
   color: #0a0805;
@@ -707,16 +754,16 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
     0 0 24px rgba(232, 197, 118, 0.25);
   overflow: hidden;
 }
-[data-theme='sigil'] body .crown-btn-primary::after {
+[data-theme='cards'] body .crown-btn-primary::after {
   content: '';
   position: absolute; inset: 0;
   background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
   background-size: 250% 100%;
   mix-blend-mode: overlay;
-  animation: sigilFoilSweep 4.5s linear infinite;
+  animation: cardsFoilSweep 4.5s linear infinite;
   pointer-events: none;
 }
-@keyframes sigilFoilSweep {
+@keyframes cardsFoilSweep {
   0%   { background-position: -120% 0; }
   100% { background-position: 220% 0; }
 }
@@ -835,7 +882,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   color: transparent;
   animation: chromeFlow 6s linear infinite;
 }
-[data-theme='sigil'] .mythic-name { color: var(--accent-flat); text-shadow: 0 0 32px rgba(201, 162, 86, 0.6); font-style: italic; }
+[data-theme='cards'] .mythic-name { color: var(--accent-flat); text-shadow: 0 0 32px rgba(201, 162, 86, 0.6); font-style: italic; }
 [data-theme='brutal'] .mythic-name { text-transform: uppercase; }
 @keyframes mythicIn {
   0% { opacity: 0; }
@@ -866,7 +913,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
 }
 
 /* SIGIL Mythic — XXI major arcana reveal */
-[data-theme='sigil'] .mythic-moment-card {
+[data-theme='cards'] .mythic-moment-card {
   background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 60%, #d4c393);
   border: none;
   border-radius: 4px;
@@ -879,13 +926,13 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
     0 0 80px rgba(255, 158, 70, 0.35);
   padding: 56px 30px 28px;
   isolation: isolate;
-  animation: sigilMythicFloat 4s ease-in-out infinite;
+  animation: cardsMythicFloat 4s ease-in-out infinite;
 }
-@keyframes sigilMythicFloat {
+@keyframes cardsMythicFloat {
   0%, 100% { transform: translateY(0) rotate(-0.5deg); }
   50%      { transform: translateY(-6px) rotate(0.5deg); }
 }
-[data-theme='sigil'] .mythic-moment-card::before {
+[data-theme='cards'] .mythic-moment-card::before {
   content: 'XXI';
   position: absolute;
   top: -1px; left: 50%;
@@ -904,7 +951,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   color: #1a1108;
   z-index: 6;
 }
-[data-theme='sigil'] .mythic-moment-card::after {
+[data-theme='cards'] .mythic-moment-card::after {
   content: '';
   position: absolute;
   inset: 12px;
@@ -913,7 +960,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   pointer-events: none;
   box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256;
 }
-[data-theme='sigil'] .mythic-eyebrow {
+[data-theme='cards'] .mythic-eyebrow {
   font-family: 'Cinzel', serif;
   font-weight: 600;
   font-size: 10px;
@@ -921,7 +968,7 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   color: #8a6a2a;
   text-transform: uppercase;
 }
-[data-theme='sigil'] .mythic-name {
+[data-theme='cards'] .mythic-name {
   font-family: 'Cinzel', serif;
   font-weight: 700;
   font-size: 36px;
@@ -931,8 +978,8 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   text-shadow: none;
   font-style: normal;
 }
-[data-theme='sigil'] .mythic-crown { color: #1a1108; }
-[data-theme='sigil'] .mythic-cta {
+[data-theme='cards'] .mythic-crown { color: #1a1108; }
+[data-theme='cards'] .mythic-cta {
   background: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a);
   color: #0a0805;
   font-family: 'Cinzel', serif;
@@ -944,13 +991,13 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   position: relative;
   overflow: hidden;
 }
-[data-theme='sigil'] .mythic-cta::after {
+[data-theme='cards'] .mythic-cta::after {
   content: '';
   position: absolute; inset: 0;
   background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
   background-size: 250% 100%;
   mix-blend-mode: overlay;
-  animation: sigilFoilSweep 3.6s linear infinite;
+  animation: cardsFoilSweep 3.6s linear infinite;
   pointer-events: none;
 }
 @keyframes mythicCrown {

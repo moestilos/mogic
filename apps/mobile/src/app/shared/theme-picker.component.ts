@@ -200,6 +200,7 @@ export class ThemePickerComponent {
       case 'brutal': return '#08080a';
       case 'sigil': return '#0a0805';
       case 'stark': return '#fafaf6';
+      case 'cards': return 'radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393)';
     }
   }
 
@@ -211,6 +212,7 @@ export class ThemePickerComponent {
       case 'brutal': return '#ffffff';
       case 'sigil': return '#C9A256';
       case 'stark': return '#14140e';
+      case 'cards': return 'linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a)';
     }
   }
 
@@ -222,6 +224,7 @@ export class ThemePickerComponent {
       case 'brutal': return "'JetBrains Mono', monospace";
       case 'sigil': return "'Cormorant Garamond', serif";
       case 'stark': return "'Instrument Serif', serif";
+      case 'cards': return "'Cinzel', serif";
     }
   }
 }

@@ -98,6 +98,12 @@ import { ThemeStore } from '../core/stores/theme.store';
         <div class="bg-stark-hex"></div>
         <div class="bg-stark-hex bg-stark-hex-2"></div>
       }
+      <!-- Cards: velvet table — soft candle spotlight + heavy grain -->
+      @if (theme.current() === 'cards') {
+        <div class="bg-cards-vignette"></div>
+        <div class="bg-cards-grain"></div>
+        <div class="bg-cards-candle"></div>
+      }
     </div>
   `,
   styles: [`
@@ -211,6 +217,31 @@ import { ThemeStore } from '../core/stores/theme.store';
     @keyframes starkHexDrift2 {
       0%   { background-position: 0 0; }
       100% { background-position: -84px 96px; }
+    }
+
+    /* ── CARDS — velvet table + candle + grain ── */
+    .bg-cards-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(80% 60% at 50% 40%, transparent 50%, rgba(0,0,0,0.55) 100%);
+    }
+    .bg-cards-grain {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      opacity: 0.06;
+      mix-blend-mode: overlay;
+    }
+    .bg-cards-candle {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 80vmax; height: 80vmax;
+      background: radial-gradient(50% 50% at 50% 0%, rgba(201, 162, 86, 0.18), rgba(255, 158, 70, 0.06) 40%, transparent 70%);
+      pointer-events: none;
+      animation: cardsCandleFlicker 6s ease-in-out infinite;
+    }
+    @keyframes cardsCandleFlicker {
+      0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+      50%      { opacity: 1;   transform: translateX(-50%) scale(1.05); }
     }
 
     /* ── BRUTAL — visible 16px grid + scanline ── */

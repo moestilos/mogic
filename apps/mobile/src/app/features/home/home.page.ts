@@ -357,6 +357,7 @@ import { IconComponent } from '../../shared/icon.component';
     .home-theme-swatch.brutal { background: #fff; border: 2px solid #08080a; }
     .home-theme-swatch.sigil { background: #C9A256; }
     .home-theme-swatch.stark { background: #14140e; }
+    .home-theme-swatch.cards { background: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a); box-shadow: inset 0 0 0 1px #3a2818; }
   `],
 })
 export class HomePage implements OnInit {

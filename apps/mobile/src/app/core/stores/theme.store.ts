@@ -1,7 +1,7 @@
 import { Injectable, effect, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 
-export type ThemeId = 'chrome' | 'editorial' | 'vapor' | 'brutal' | 'sigil' | 'stark';
+export type ThemeId = 'chrome' | 'editorial' | 'vapor' | 'brutal' | 'sigil' | 'stark' | 'cards';
 
 export interface ThemeMeta {
   id: ThemeId;
@@ -17,6 +17,7 @@ export const THEMES: ThemeMeta[] = [
   { id: 'brutal',    name: 'Carbon Brutalist',  tagline: 'Print-shop. Grid visible, mono total.',  tags: ['Mono', 'Loud'] },
   { id: 'sigil',     name: 'Sigil',             tagline: 'Arcana moderna. Acento dorado.',         tags: ['Serif', 'Reverent'] },
   { id: 'stark',     name: 'Stark Field',       tagline: 'Light mode. Tipografía arquitectónica.', tags: ['Light', 'Type'] },
+  { id: 'cards',     name: 'Card Sigil',        tagline: 'Cartas tarot, ink frame, gold foil.',    tags: ['Tarot', 'Foil'] },
 ];
 
 const STORAGE_KEY = 'crown.theme';
