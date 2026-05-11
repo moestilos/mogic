@@ -724,37 +724,252 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   color: #3a2818 !important;
 }
 
-/* Bottom action bar = mini cards */
-[data-theme='cards'] body .crown-btn,
-[data-theme='cards'] body .crown-btn-primary {
-  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
+/* ─── EVERYTHING IS A CARD (full system override) ─── */
+
+/* crown-card / crown-modal → tarot paper card */
+[data-theme='cards'] .crown-card,
+[data-theme='cards'] .crown-modal,
+[data-theme='cards'] .home-tile,
+[data-theme='cards'] .home-resume,
+[data-theme='cards'] .home-cta,
+[data-theme='cards'] .home-stat,
+[data-theme='cards'] .home-theme-row,
+[data-theme='cards'] .profile-hero,
+[data-theme='cards'] .profile-stat-card,
+[data-theme='cards'] .profile-empty,
+[data-theme='cards'] .profile-suggest,
+[data-theme='cards'] .profile-request,
+[data-theme='cards'] .profile-setting,
+[data-theme='cards'] .player-card {
+  position: relative;
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393) !important;
+  border: 1px solid rgba(0,0,0,0.4) !important;
+  border-radius: 4px !important;
+  color: #1a1108 !important;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.4),
+    0 8px 16px rgba(0,0,0,0.45),
+    inset 0 0 0 0.5px rgba(255,255,255,0.18) !important;
+  isolation: isolate;
+}
+/* Double ink frame on every card surface */
+[data-theme='cards'] .crown-card::before,
+[data-theme='cards'] .crown-modal::before,
+[data-theme='cards'] .home-tile::before,
+[data-theme='cards'] .home-resume::before,
+[data-theme='cards'] .home-cta::before,
+[data-theme='cards'] .home-stat::before,
+[data-theme='cards'] .home-theme-row::before,
+[data-theme='cards'] .profile-stat-card::before,
+[data-theme='cards'] .profile-suggest::before,
+[data-theme='cards'] .profile-request::before,
+[data-theme='cards'] .profile-setting::before {
+  content: '';
+  position: absolute; inset: 4px;
   border: 1px solid #3a2818;
-  color: #1a1108;
-  border-radius: 3px;
-  font-family: 'Cinzel', serif;
-  font-style: normal;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Paper grain */
+[data-theme='cards'] .crown-card::after,
+[data-theme='cards'] .home-tile::after,
+[data-theme='cards'] .home-resume::after,
+[data-theme='cards'] .home-cta::after,
+[data-theme='cards'] .home-stat::after,
+[data-theme='cards'] .profile-stat-card::after,
+[data-theme='cards'] .profile-suggest::after,
+[data-theme='cards'] .profile-request::after,
+[data-theme='cards'] .profile-setting::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0 0.2  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.10; mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Text & icons inside cards → ink */
+[data-theme='cards'] .crown-text-hi,
+[data-theme='cards'] .crown-display,
+[data-theme='cards'] .home-stat-num,
+[data-theme='cards'] .home-tile-title,
+[data-theme='cards'] .home-cta-title,
+[data-theme='cards'] .profile-hero-name,
+[data-theme='cards'] .profile-stat-num,
+[data-theme='cards'] .profile-hero-stat-num,
+[data-theme='cards'] .profile-setting-title,
+[data-theme='cards'] .profile-suggest-name { color: #1a1108 !important; }
+
+[data-theme='cards'] .home-stat-label,
+[data-theme='cards'] .home-tile-sub,
+[data-theme='cards'] .home-cta-sub,
+[data-theme='cards'] .profile-hero-stat-label,
+[data-theme='cards'] .profile-stat-label,
+[data-theme='cards'] .profile-setting-sub,
+[data-theme='cards'] .profile-suggest-email,
+[data-theme='cards'] .crown-text-lo,
+[data-theme='cards'] .crown-text-mid {
+  color: #6a523a !important;
+}
+
+[data-theme='cards'] .crown-hud {
+  font-family: 'Cinzel', serif !important;
+  color: #8a6a2a !important;
+  letter-spacing: 0.42em !important;
+  text-transform: uppercase !important;
+}
+
+/* Stat numbers Cormorant ink, like life numerals */
+[data-theme='cards'] .home-stat-num,
+[data-theme='cards'] .profile-stat-num,
+[data-theme='cards'] .profile-hero-stat-num {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-weight: 300 !important;
+  color: #1a1108 !important;
+}
+/* Display headings Cormorant italic ink */
+[data-theme='cards'] .crown-display,
+[data-theme='cards'] .home-cta-title,
+[data-theme='cards'] .home-tile-title {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-weight: 400 !important;
+  color: #1a1108 !important;
+}
+
+/* Avatar/icon circles inside cards = ink medallions */
+[data-theme='cards'] .profile-avatar,
+[data-theme='cards'] .home-resume-icon,
+[data-theme='cards'] .home-cta-art,
+[data-theme='cards'] .home-tile-icon,
+[data-theme='cards'] .profile-suggest-avatar,
+[data-theme='cards'] .profile-stat-icon,
+[data-theme='cards'] .profile-setting-icon {
+  background: rgba(58,40,24,0.08) !important;
+  border: 1px solid #3a2818 !important;
+  color: #1a1108 !important;
+  border-radius: 4px !important;
+}
+
+/* Color stripe sigil-style not needed: hide on cards */
+[data-theme='cards'] .profile-hero-stripe { display: none !important; }
+
+/* Profile-hero name uppercase Cinzel small caps */
+[data-theme='cards'] .profile-hero-name {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  font-size: clamp(22px, 5vw, 32px) !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+/* HUD chips inside hero (handle, color chip) */
+[data-theme='cards'] .profile-handle,
+[data-theme='cards'] .profile-color-chip {
+  background: rgba(58,40,24,0.08) !important;
+  color: #3a2818 !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  border-radius: 99px;
+}
+
+/* Inputs become parchment slips */
+[data-theme='cards'] .crown-input,
+[data-theme='cards'] .edit-input,
+[data-theme='cards'] .profile-search,
+[data-theme='cards'] .profile-search-input {
+  background: rgba(58,40,24,0.05) !important;
+  border: 1px solid #3a2818 !important;
+  color: #1a1108 !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  border-radius: 2px !important;
+}
+[data-theme='cards'] .crown-input::placeholder,
+[data-theme='cards'] .edit-input::placeholder,
+[data-theme='cards'] .profile-search-input::placeholder { color: #6a523a !important; }
+
+/* Tabs inside cards (profile tabs, edit tabs) = small card row */
+[data-theme='cards'] .profile-tabs,
+[data-theme='cards'] .edit-tabs {
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393) !important;
+  border: 1px solid #3a2818 !important;
+  border-radius: 3px !important;
+}
+[data-theme='cards'] .profile-tab,
+[data-theme='cards'] .edit-tab {
+  color: #6a523a !important;
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+}
+[data-theme='cards'] .profile-tab.is-on,
+[data-theme='cards'] .edit-tab.is-on {
+  background: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a) !important;
+  color: #0a0805 !important;
+  border-radius: 2px !important;
+  animation: none !important;
+}
+[data-theme='cards'] .profile-tab-count,
+[data-theme='cards'] .profile-tab-badge {
+  background: rgba(58,40,24,0.18) !important;
+  color: #1a1108 !important;
+}
+
+/* Tags become tiny cards */
+[data-theme='cards'] .crown-tag {
+  background: rgba(58,40,24,0.06) !important;
+  border: 1px solid #3a2818 !important;
+  color: #3a2818 !important;
+  border-radius: 2px !important;
+  font-family: 'Cinzel', serif !important;
+}
+
+/* Backdrop velvet on cards modals */
+[data-theme='cards'] .crown-backdrop {
+  background: radial-gradient(60% 50% at 50% 50%, rgba(201,162,86,0.18), transparent 70%), rgba(0,0,0,0.85) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Bottom action bar = mini cards */
+[data-theme='cards'] .crown-btn,
+[data-theme='cards'] .profile-icon-btn,
+[data-theme='cards'] .edit-icon-btn {
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393) !important;
+  border: 1px solid #3a2818 !important;
+  color: #1a1108 !important;
+  border-radius: 3px !important;
+  font-family: 'Cinzel', serif !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.18em !important;
   position: relative;
   isolation: isolate;
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.3),
     0 2px 0 rgba(0,0,0,0.3),
-    0 6px 12px rgba(0,0,0,0.35);
+    0 6px 12px rgba(0,0,0,0.35) !important;
 }
-[data-theme='cards'] body .crown-btn-primary {
-  background: radial-gradient(140% 100% at 50% 0%, #e8c576, #c9a256 60%, #8a6a2a);
-  border-color: #8a6a2a;
-  color: #0a0805;
-  font-weight: 700;
+[data-theme='cards'] .crown-btn-primary,
+[data-theme='cards'] .edit-cta {
+  background: radial-gradient(140% 100% at 50% 0%, #e8c576, #c9a256 60%, #8a6a2a) !important;
+  border: 1px solid #8a6a2a !important;
+  color: #0a0805 !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.22em !important;
+  text-transform: uppercase !important;
+  border-radius: 3px !important;
+  animation: none !important;
   box-shadow:
     0 0 0 1px #8a6a2a,
     0 2px 0 rgba(0,0,0,0.4),
     0 10px 24px rgba(201,162,86,0.4),
-    0 0 24px rgba(232, 197, 118, 0.25);
+    0 0 24px rgba(232, 197, 118, 0.25) !important;
   overflow: hidden;
+  position: relative;
 }
-[data-theme='cards'] body .crown-btn-primary::after {
+[data-theme='cards'] .crown-btn-primary::after,
+[data-theme='cards'] .edit-cta::after {
   content: '';
   position: absolute; inset: 0;
   background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
@@ -762,6 +977,13 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   mix-blend-mode: overlay;
   animation: cardsFoilSweep 4.5s linear infinite;
   pointer-events: none;
+}
+[data-theme='cards'] .crown-btn-ghost {
+  background: transparent !important;
+  border: none !important;
+  color: #8a6a2a !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
 }
 @keyframes cardsFoilSweep {
   0%   { background-position: -120% 0; }
