@@ -44,8 +44,6 @@ const GLOW: Record<ManaColor, string> = {
               [class.is-out]="p.eliminated"
               [style.--pod-glow]="glowFor(p.color)">
 
-              <div class="crown-pod-stripe" [ngClass]="pipFor(p.color)"></div>
-
               <!-- Top half tap zone: +1 -->
               <div
                 class="absolute inset-x-0 top-0 h-1/2 z-10 cursor-pointer"
@@ -73,14 +71,10 @@ const GLOW: Record<ManaColor, string> = {
 
               <!-- Content (no pointer events) -->
               <div class="absolute inset-0 flex flex-col pointer-events-none px-3 py-2.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style="background: rgba(255,255,255,0.06); border: 1px solid var(--divider);">
-                    <crown-icon [name]="$any(avatarFor(p, $index))" [size]="12" cls="crown-text-mid"></crown-icon>
-                  </div>
-                  <div class="crown-pod-name text-[11px] truncate flex-1" style="font-weight: 500; letter-spacing: 0.01em;">
+                <div class="flex items-center justify-center">
+                  <div class="crown-pod-name text-[11px] truncate" style="font-weight: 500; letter-spacing: 0.01em;">
                     {{ p.name }}
                   </div>
-                  <div class="crown-pip flex-shrink-0" [ngClass]="pipFor(p.color)"></div>
                 </div>
 
                 <div class="flex-1 flex items-center justify-center">
@@ -129,9 +123,6 @@ const GLOW: Record<ManaColor, string> = {
             <crown-icon name="Undo2" [size]="18"></crown-icon>
           </button>
           <button class="crown-btn-primary flex-[2.2] py-3 text-[11px] uppercase tracking-widest" (click)="turn()">Pass turn</button>
-          <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="dice()" aria-label="Roll D20">
-            <crown-icon name="Dice5" [size]="18"></crown-icon>
-          </button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="themePickerOpen.set(true)" aria-label="Theme">
             <crown-icon name="Sparkles" [size]="18"></crown-icon>
           </button>
@@ -173,17 +164,6 @@ const GLOW: Record<ManaColor, string> = {
           </div>
         }
 
-        @if (diceResult() !== null) {
-          <div class="fixed inset-0 flex items-center justify-center z-40"
-               (click)="diceResult.set(null)">
-            <div class="crown-backdrop"></div>
-            <div class="text-center relative">
-              <div class="crown-hud mb-3">D20</div>
-              <div class="crown-pod-life crown-text-accent" style="font-size: clamp(120px, 30vmin, 260px); line-height: 1;">{{ diceResult() }}</div>
-              <div class="crown-text-lo text-sm mt-4" style="font-family: var(--font-hud);">tap para cerrar</div>
-            </div>
-          </div>
-        }
       </div>
     </ion-content>
   `,
@@ -204,7 +184,6 @@ export class GamePage implements OnInit, OnDestroy {
 
   readonly pulseId = signal<string | null>(null);
   readonly flashPid = signal<string | null>(null);
-  readonly diceResult = signal<number | null>(null);
   readonly drawerPid = signal<string | null>(null);
   readonly cmdMatrixPid = signal<string | null>(null);
   readonly themePickerOpen = signal(false);
@@ -223,7 +202,6 @@ export class GamePage implements OnInit, OnDestroy {
         this.drawerPid.set(null);
         this.cmdMatrixPid.set(null);
         this.themePickerOpen.set(false);
-        this.diceResult.set(null);
       }
     });
   }
@@ -390,13 +368,6 @@ export class GamePage implements OnInit, OnDestroy {
 
   turn() { void this.haptics.medium(); this.store.nextTurn(); }
   undo() { void this.haptics.light(); this.store.undo(); }
-
-  dice() {
-    void this.haptics.medium();
-    const r = 1 + Math.floor(Math.random() * 20);
-    this.diceResult.set(r);
-    setTimeout(() => void this.haptics.light(), 100);
-  }
 
   async finish() {
     const snap = this.store.game();

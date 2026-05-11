@@ -44,6 +44,32 @@ export class AuthStore {
   });
   readonly isSignedIn = computed(() => !!this.me());
 
+  readonly isAdmin = computed(() => {
+    const me = this.me();
+    if (!me) return false;
+    return me.email.toLowerCase() === 'gmateosoficial@gmail.com';
+  });
+
+  /** Full accounts list (no password hash) — only for admin views. */
+  readonly allAccounts = computed(() => {
+    return this._accounts().map((a) => ({
+      id: a.id,
+      email: a.email,
+      username: a.username,
+      displayName: a.displayName,
+      color: a.color,
+      avatar: a.avatar,
+      createdAt: a.createdAt,
+    }));
+  });
+
+  async adminDeleteAccount(accountId: string): Promise<void> {
+    if (!this.isAdmin()) return;
+    if (accountId === this._sessionId()) return; // no self-delete via admin
+    this._accounts.set(this._accounts().filter((a) => a.id !== accountId));
+    await this.persistAccounts();
+  }
+
   /** Other accounts on this device (excluding current session). Public-safe shape (no passwordHash). */
   readonly otherAccounts = computed(() => {
     const id = this._sessionId();

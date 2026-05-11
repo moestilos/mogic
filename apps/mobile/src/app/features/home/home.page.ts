@@ -6,6 +6,7 @@ import { GameStore } from '../../core/stores/game.store';
 import { GroupsStore } from '../../core/stores/groups.store';
 import { ThemeStore } from '../../core/stores/theme.store';
 import { ProfileStore } from '../../core/stores/profile.store';
+import { AuthStore } from '../../core/stores/auth.store';
 import { ThemePickerComponent } from '../../shared/theme-picker.component';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
@@ -48,6 +49,14 @@ import { IconComponent } from '../../shared/icon.component';
                     aria-label="Perfil">
               <crown-icon [name]="$any(profile.me()?.avatar ?? 'Settings')" [size]="18"></crown-icon>
             </button>
+            @if (auth.isAdmin()) {
+              <button class="home-icon-btn"
+                      style="border-color: var(--accent-flat); box-shadow: var(--accent-glow);"
+                      (click)="openAdmin()"
+                      aria-label="Admin">
+                <crown-icon name="Shield" [size]="18" cls="crown-text-accent"></crown-icon>
+              </button>
+            }
           </div>
         </header>
 
@@ -137,16 +146,6 @@ import { IconComponent } from '../../shared/icon.component';
               } @else { Añadir }
             </div>
             <div class="home-tile-sub">Win tracking auto</div>
-          </button>
-
-          <button class="home-tile crown-pod text-left transition opacity-60"
-                  disabled>
-            <div class="home-tile-icon">
-              <crown-icon name="Dice5" [size]="28" cls="crown-text-lo"></crown-icon>
-            </div>
-            <div class="crown-hud mt-3">Tools</div>
-            <div class="home-tile-title">Dados</div>
-            <div class="home-tile-sub">D20 · D6 · coin</div>
           </button>
 
           <button class="home-tile crown-pod text-left transition opacity-60"
@@ -364,6 +363,7 @@ export class HomePage implements OnInit {
   readonly game = inject(GameStore);
   readonly theme = inject(ThemeStore);
   readonly profile = inject(ProfileStore);
+  readonly auth = inject(AuthStore);
   readonly groupsStore = inject(GroupsStore);
   private readonly router = inject(Router);
 
@@ -394,4 +394,5 @@ export class HomePage implements OnInit {
   resume() { void this.router.navigate(['/game']); }
   openGroups() { void this.router.navigate(['/groups']); }
   openProfile() { void this.router.navigate(['/profile']); }
+  openAdmin() { void this.router.navigate(['/admin']); }
 }

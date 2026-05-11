@@ -47,4 +47,5 @@ export const routes: Routes = [
   { path: 'groups/new', canActivate: [requireAuth], loadComponent: () => import('./features/groups/group-new.page').then((m) => m.GroupNewPage) },
   { path: 'groups/:id', canActivate: [requireAuth], loadComponent: () => import('./features/groups/group-detail.page').then((m) => m.GroupDetailPage) },
   { path: 'profile', canActivate: [requireAuth], loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage) },
+  { path: 'admin', canActivate: [requireAuth], loadComponent: () => import('./features/admin/admin.page').then((m) => m.AdminPage) },
 ];
