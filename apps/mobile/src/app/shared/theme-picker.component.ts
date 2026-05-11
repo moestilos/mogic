@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { ThemeStore, type ThemeId } from '../core/stores/theme.store';
+import { ThemeStore, type ThemeId, type BrutalAccent } from '../core/stores/theme.store';
 import { HapticsService } from '../core/services/haptics.service';
 import { IconComponent } from './icon.component';
 
@@ -23,6 +23,22 @@ import { IconComponent } from './icon.component';
             <crown-icon name="X" [size]="20"></crown-icon>
           </button>
         </div>
+
+        @if (store.current() === 'brutal') {
+          <div class="brutal-accents">
+            <div class="brutal-accents-label">Color de tinta</div>
+            <div class="brutal-accents-grid">
+              @for (a of store.brutalAccents; track a.id) {
+                <button class="brutal-swatch"
+                        [class.is-on]="store.brutalAccent() === a.id"
+                        [style.background]="a.hex"
+                        [style.box-shadow]="store.brutalAccent() === a.id ? '0 0 0 2px ' + a.hex : 'none'"
+                        [title]="a.label"
+                        (click)="pickAccent(a.id)"></button>
+              }
+            </div>
+          </div>
+        }
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           @for (t of store.themes; track t.id) {
@@ -179,6 +195,40 @@ import { IconComponent } from './icon.component';
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
     }
+
+    .brutal-accents {
+      padding: 14px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+    .brutal-accents-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #9999a8;
+      margin-bottom: 10px;
+    }
+    .brutal-accents-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 480px) {
+      .brutal-accents-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    .brutal-swatch {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: transform 120ms ease;
+      padding: 0;
+    }
+    .brutal-swatch:hover { transform: scale(1.08); }
+    .brutal-swatch.is-on { border-color: transparent; transform: scale(1.05); }
   `],
 })
 export class ThemePickerComponent {
@@ -189,7 +239,15 @@ export class ThemePickerComponent {
   async pick(id: ThemeId) {
     void this.haptics.medium();
     await this.store.set(id);
-    setTimeout(() => this.close.emit(), 220);
+    // If picking brutal, keep modal open so user can pick accent
+    if (id !== 'brutal') {
+      setTimeout(() => this.close.emit(), 220);
+    }
+  }
+
+  async pickAccent(id: BrutalAccent) {
+    void this.haptics.light();
+    await this.store.setBrutalAccent(id);
   }
 
   previewBg(id: ThemeId): string {

@@ -131,20 +131,24 @@
 }
 
 [data-theme='brutal'] {
+  /* Brutal accent default white — overridden per [data-brutal-accent] */
+  --brutal-ink: #ffffff;
+  --brutal-ink-dim: #888888;
+
   --bg-base: #08080a;
   --bg-elevated: #0e0e12;
   --bg-pod: #0e0e12;
-  --bg-pod-border: #ffffff;
+  --bg-pod-border: var(--brutal-ink);
   --bg-input: #0e0e12;
   --modal-backdrop: rgba(0,0,0,0.92);
-  --divider: #ffffff;
+  --divider: var(--brutal-ink);
 
-  --text-hi: #ffffff;
-  --text-mid: #ffffff;
-  --text-lo: #888888;
+  --text-hi: var(--brutal-ink);
+  --text-mid: var(--brutal-ink);
+  --text-lo: var(--brutal-ink-dim);
 
-  --accent: #ffffff;
-  --accent-flat: #ffffff;
+  --accent: var(--brutal-ink);
+  --accent-flat: var(--brutal-ink);
   --accent-text: #08080a;
   --accent-glow: none;
   --danger: #ff3333;
@@ -1262,6 +1266,47 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
 .crown-color-swatch.r { background: linear-gradient(135deg, #F8B7B0, #D24F45); }
 .crown-color-swatch.g { background: linear-gradient(135deg, #BFE6A6, #5A9A4C); }
 .crown-color-swatch.c { background: linear-gradient(135deg, #d8d8e0, #8b8b9e); }
+
+/* ── BRUTAL ACCENT COLOR VARIANTS ──
+   Override --brutal-ink only when theme=brutal. Default white.
+   Applied via [data-brutal-accent] on document body. */
+[data-theme='brutal'][data-brutal-accent='green']  { --brutal-ink: #4aff7a; --brutal-ink-dim: rgba(74,255,122,0.5); }
+[data-theme='brutal'][data-brutal-accent='blue']   { --brutal-ink: #4a9eff; --brutal-ink-dim: rgba(74,158,255,0.5); }
+[data-theme='brutal'][data-brutal-accent='red']    { --brutal-ink: #ff4a4a; --brutal-ink-dim: rgba(255,74,74,0.5); }
+[data-theme='brutal'][data-brutal-accent='purple'] { --brutal-ink: #b366ff; --brutal-ink-dim: rgba(179,102,255,0.5); }
+[data-theme='brutal'][data-brutal-accent='yellow'] { --brutal-ink: #ffea4a; --brutal-ink-dim: rgba(255,234,74,0.5); }
+[data-theme='brutal'][data-brutal-accent='orange'] { --brutal-ink: #ff8c33; --brutal-ink-dim: rgba(255,140,51,0.5); }
+[data-theme='brutal'][data-brutal-accent='cyan']   { --brutal-ink: #4adfff; --brutal-ink-dim: rgba(74,223,255,0.5); }
+[data-theme='brutal'][data-brutal-accent='pink']   { --brutal-ink: #ff66c2; --brutal-ink-dim: rgba(255,102,194,0.5); }
+
+/* Active pod invert with accent color */
+[data-theme='brutal'] .crown-pod.is-active {
+  background: var(--brutal-ink) !important;
+  color: var(--bg-base) !important;
+}
+[data-theme='brutal'] .crown-pod.is-active .crown-pod-name,
+[data-theme='brutal'] .crown-pod.is-active .crown-pod-life,
+[data-theme='brutal'] .crown-pod.is-active * {
+  color: var(--bg-base) !important;
+}
+[data-theme='brutal'] .crown-pod.is-active::after {
+  border-color: var(--brutal-ink) !important;
+}
+[data-theme='brutal'] .crown-btn-primary {
+  background: var(--brutal-ink) !important;
+  color: var(--bg-base) !important;
+}
+
+/* Animated bg grid + scanline use brutal-ink */
+[data-theme='brutal'] .bg-brutal-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brutal-ink) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brutal-ink) 6%, transparent) 1px, transparent 1px) !important;
+}
+[data-theme='brutal'] .bg-brutal-scanline {
+  background: color-mix(in srgb, var(--brutal-ink) 30%, transparent) !important;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--brutal-ink) 50%, transparent) !important;
+}
 
 /* Util text colors */
 .crown-text-hi  { color: var(--text-hi); }
