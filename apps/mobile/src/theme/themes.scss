@@ -521,20 +521,204 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
 }
 [data-theme='brutal'] .crown-pod.is-active .crown-pip { filter: invert(1) brightness(0.4); }
 
-[data-theme='sigil'] .crown-pod { border-left: none; border-right: none; }
-[data-theme='sigil'] .crown-pod.is-active { border-color: var(--accent); }
-[data-theme='sigil'] .crown-pod.is-active::before {
+/* ── SIGIL — tarot card pod (paper + ink frame + roman cap + foot title) ─ */
+[data-theme='sigil'] .crown-pod {
+  background:
+    radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
+  border: 1px solid rgba(0,0,0,0.4) !important;
+  border-radius: 4px !important;
+  color: #1a1108;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.4),
+    0 8px 16px rgba(0,0,0,0.45),
+    inset 0 0 0 0.5px rgba(255,255,255,0.18);
+  isolation: isolate;
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 600ms;
+  padding: 14px 10px 10px !important;
+}
+/* Paper grain inside card */
+[data-theme='sigil'] .crown-pod::after {
   content: '';
-  position: absolute;
-  top: -1px; bottom: -1px;
-  left: 0; width: 2px;
-  background: linear-gradient(180deg, transparent, var(--accent), transparent);
-  animation: sigilGlide 3s ease-in-out infinite;
-  pointer-events: none;
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0 0.2  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.10; mix-blend-mode: multiply;
+  pointer-events: none; z-index: 0;
+}
+/* Double ink frame */
+[data-theme='sigil'] .crown-pod::before {
+  content: '';
+  position: absolute; inset: 4px;
+  border: 1px solid #3a2818;
+  border-radius: 2px;
+  pointer-events: none; z-index: 1;
+}
+[data-theme='sigil'] .crown-pod-stripe { display: none; }
+
+/* Active state: lift + gold halo + breath */
+[data-theme='sigil'] .crown-pod.is-active {
+  transform: translateY(-4px) rotate(-0.6deg);
+  box-shadow:
+    0 0 0 1px #8a6a2a,
+    0 2px 0 rgba(0,0,0,0.4),
+    0 14px 30px rgba(0,0,0,0.55),
+    0 0 32px rgba(255, 158, 70, 0.30),
+    0 0 64px rgba(201, 162, 86, 0.18);
+  z-index: 5;
+}
+[data-theme='sigil'] .crown-pod.is-active::before {
+  border-color: #8a6a2a;
+  /* segundo frame interior */
+  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256;
 }
 [data-theme='sigil'] .crown-pod.is-active .crown-pod-life {
-  color: var(--accent-flat);
-  text-shadow: 0 0 24px rgba(201, 162, 86, 0.5);
+  color: #1a1108;
+}
+[data-theme='sigil'] .crown-pod-life {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.05em !important;
+  color: #1a1108 !important;
+}
+[data-theme='sigil'] .crown-pod-name {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: #1a1108 !important;
+  text-align: center !important;
+}
+
+/* Counter strip footer inside sigil card */
+[data-theme='sigil'] .crown-pod {
+  /* hint: text-color counters via theme color overrides */
+}
+
+/* OUT face-down */
+[data-theme='sigil'] .crown-pod.is-out {
+  transform: rotate(2deg);
+  filter: grayscale(0.4);
+  opacity: 0.85;
+}
+[data-theme='sigil'] .crown-pod.is-out::after {
+  /* Crosshatch back overlay */
+  background-image:
+    url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0 0.2  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+    repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(58,40,24,0.15) 6px, rgba(58,40,24,0.15) 7px);
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+[data-theme='sigil'] .crown-pod.is-out .crown-pod-life,
+[data-theme='sigil'] .crown-pod.is-out .crown-pod-name { display: none; }
+
+/* Candle breath halo behind active card */
+[data-theme='sigil'] .crown-pod.is-active::before {
+  animation: sigilCandle 3.2s ease-in-out infinite;
+}
+@keyframes sigilCandle {
+  0%, 100% { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256; }
+  50%      { box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #e8c576; }
+}
+
+/* Roman cap (only sigil) */
+.crown-pod-cap {
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 26px; height: 16px;
+  display: none;
+  align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  z-index: 6;
+  pointer-events: none;
+}
+[data-theme='sigil'] .crown-pod-cap {
+  display: flex;
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9);
+  border: 1px solid #3a2818;
+  border-top: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  color: #3a2818;
+}
+[data-theme='sigil'] .crown-pod.is-active .crown-pod-cap {
+  background: linear-gradient(180deg, #e8c576, #c9a256);
+  border-color: #8a6a2a;
+  color: #1a1108;
+}
+
+/* Avatar+pip dark inside sigil card */
+[data-theme='sigil'] .crown-pod .crown-pod-name { color: #1a1108 !important; }
+[data-theme='sigil'] .crown-pod [style*="background: rgba(255,255,255,0.06)"] {
+  background: rgba(58,40,24,0.08) !important;
+  border-color: #3a2818 !important;
+  color: #3a2818 !important;
+}
+[data-theme='sigil'] .crown-pod .crown-pip {
+  box-shadow: 0 0 0 1px #3a2818;
+}
+
+/* Counters strip on sigil paper bg → ink color */
+[data-theme='sigil'] .crown-pod > div > div:last-child {
+  color: #6a523a !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  font-size: 11px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Hold hint dark on paper */
+[data-theme='sigil'] .crown-pod button[aria-label='Open counters'] {
+  background: rgba(58,40,24,0.08) !important;
+  border-color: rgba(58,40,24,0.3) !important;
+  color: #3a2818 !important;
+}
+
+/* Bottom action bar on sigil = mini cards */
+[data-theme='sigil'] body .crown-btn,
+[data-theme='sigil'] body .crown-btn-primary {
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 70%, #d4c393);
+  border: 1px solid #3a2818;
+  color: #1a1108;
+  border-radius: 3px;
+  font-family: 'Cinzel', serif;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.3),
+    0 2px 0 rgba(0,0,0,0.3),
+    0 6px 12px rgba(0,0,0,0.35);
+}
+[data-theme='sigil'] body .crown-btn-primary {
+  background: radial-gradient(140% 100% at 50% 0%, #e8c576, #c9a256 60%, #8a6a2a);
+  border-color: #8a6a2a;
+  color: #0a0805;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px #8a6a2a,
+    0 2px 0 rgba(0,0,0,0.4),
+    0 10px 24px rgba(201,162,86,0.4),
+    0 0 24px rgba(232, 197, 118, 0.25);
+  overflow: hidden;
+}
+[data-theme='sigil'] body .crown-btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
+  background-size: 250% 100%;
+  mix-blend-mode: overlay;
+  animation: sigilFoilSweep 4.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes sigilFoilSweep {
+  0%   { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
 }
 
 [data-theme='stark'] .crown-pod { background: transparent; border: none; }
@@ -679,6 +863,95 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
   color: #ffe89d;
   display: flex; justify-content: center;
   animation: mythicCrown 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* SIGIL Mythic — XXI major arcana reveal */
+[data-theme='sigil'] .mythic-moment-card {
+  background: radial-gradient(140% 100% at 50% 0%, #efe5cc, #e6dab9 60%, #d4c393);
+  border: none;
+  border-radius: 4px;
+  color: #1a1108;
+  box-shadow:
+    0 0 0 1px #8a6a2a,
+    0 0 0 4px #0a0805,
+    0 0 0 5px #c9a256,
+    0 30px 70px rgba(0,0,0,0.7),
+    0 0 80px rgba(255, 158, 70, 0.35);
+  padding: 56px 30px 28px;
+  isolation: isolate;
+  animation: sigilMythicFloat 4s ease-in-out infinite;
+}
+@keyframes sigilMythicFloat {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50%      { transform: translateY(-6px) rotate(0.5deg); }
+}
+[data-theme='sigil'] .mythic-moment-card::before {
+  content: 'XXI';
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 42px; height: 24px;
+  background: linear-gradient(180deg, #e8c576, #c9a256);
+  border: 1px solid #3a2818;
+  border-top: none;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #1a1108;
+  z-index: 6;
+}
+[data-theme='sigil'] .mythic-moment-card::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid #3a2818;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px #c9a256;
+}
+[data-theme='sigil'] .mythic-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.55em;
+  color: #8a6a2a;
+  text-transform: uppercase;
+}
+[data-theme='sigil'] .mythic-name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #1a1108;
+  text-shadow: none;
+  font-style: normal;
+}
+[data-theme='sigil'] .mythic-crown { color: #1a1108; }
+[data-theme='sigil'] .mythic-cta {
+  background: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a);
+  color: #0a0805;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  animation: none;
+  border: 1px solid #8a6a2a;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme='sigil'] .mythic-cta::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
+  background-size: 250% 100%;
+  mix-blend-mode: overlay;
+  animation: sigilFoilSweep 3.6s linear infinite;
+  pointer-events: none;
 }
 @keyframes mythicCrown {
   0% { opacity: 0; transform: translateY(-12px) scale(0.8); }

@@ -68,6 +68,9 @@ const GLOW: Record<ManaColor, string> = {
                 role="button"
                 [attr.aria-label]="'Lose life ' + p.name"></div>
 
+              <!-- Sigil card roman cap (only visible on sigil theme) -->
+              <div class="crown-pod-cap" aria-hidden="true">{{ romanFor($index) }}</div>
+
               <!-- Content (no pointer events) -->
               <div class="absolute inset-0 flex flex-col pointer-events-none px-3 py-2.5">
                 <div class="flex items-center gap-2">
@@ -284,6 +287,9 @@ export class GamePage implements OnInit, OnDestroy {
   pipFor(c: ManaColor) { return PIP[c]; }
   glowFor(c: ManaColor): string { return GLOW[c]; }
   isActive(pid: string): boolean { return this.store.activePlayer()?.id === pid; }
+  romanFor(idx: number): string {
+    return ['I','II','III','IV','V','VI'][idx] ?? String(idx + 1);
+  }
 
   avatarFor(p: Player, idx: number): string {
     try {
