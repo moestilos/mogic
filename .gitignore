@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+www
+.angular
+.nx
+coverage
+*.log
+.DS_Store
+ios/App/Pods
+ios/App/build
+android/.gradle
+android/app/build
+android/build
+.env
+.env.local
+*.tsbuildinfo

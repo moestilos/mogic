@@ -1,0 +1,19 @@
+{
+  "name": "mogic",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mogic — modern MTG Commander companion app",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "test:engine": "pnpm --filter @crown/game-engine test",
+    "dev:mobile": "pnpm --filter @crown/mobile start",
+    "build:mobile": "pnpm --filter @crown/mobile build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

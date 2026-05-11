@@ -1,0 +1,64 @@
+@use './theme/themes.scss';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ionic core */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+:root {
+  --ion-background-color: #0A0A0F;
+  --ion-background-color-rgb: 10, 10, 15;
+  --ion-text-color: #F5F5FA;
+  --ion-text-color-rgb: 245, 245, 250;
+  --ion-font-family: 'Inter', system-ui, sans-serif;
+}
+
+html, body {
+  background: #0A0A0F;
+  color: #F5F5FA;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/[0.04] border border-white/[0.08] backdrop-blur-glass;
+  }
+  .life-number {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    letter-spacing: -0.04em;
+  }
+  .neon-stripe-u { box-shadow: inset 3px 0 0 #4A9EFF, 0 0 30px rgba(74,158,255,0.25); }
+  .neon-stripe-r { box-shadow: inset 3px 0 0 #FF5A5A, 0 0 30px rgba(255,90,90,0.25); }
+  .neon-stripe-g { box-shadow: inset 3px 0 0 #4ADE80, 0 0 30px rgba(74,222,128,0.25); }
+  .neon-stripe-b { box-shadow: inset 3px 0 0 #B57AFF, 0 0 30px rgba(181,122,255,0.25); }
+  .neon-stripe-w { box-shadow: inset 3px 0 0 #FFFAF0, 0 0 30px rgba(255,250,240,0.20); }
+  .neon-stripe-c { box-shadow: inset 3px 0 0 #C8C8D4, 0 0 30px rgba(200,200,212,0.20); }
+}
+
+@keyframes life-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.life-pulse { animation: life-pulse 220ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes pod-active {
+  0% { box-shadow: 0 0 0 0 rgba(74,158,255,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(74,158,255,0); }
+}
+.pod-active { animation: pod-active 1.6s ease-out infinite; }
