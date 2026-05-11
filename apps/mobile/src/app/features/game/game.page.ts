@@ -30,7 +30,7 @@ const GLOW: Record<ManaColor, string> = {
   imports: [IonContent, NgClass, CounterDrawerComponent, CmdDamageMatrixComponent, ThemePickerComponent, AnimatedBackgroundComponent, IconComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
-      <div class="h-screen w-screen flex flex-col overflow-hidden relative" style="background: var(--bg-base);">
+      <div class="h-screen w-screen flex flex-col overflow-hidden relative" style="background: var(--bg-base); padding-top: env(safe-area-inset-top, 0); padding-left: env(safe-area-inset-left, 0); padding-right: env(safe-area-inset-right, 0);">
 
         <app-animated-background></app-animated-background>
 
