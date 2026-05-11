@@ -161,4 +161,56 @@ export class AuthStore {
     this._accounts.set(this._accounts().map((a) => a.id === id ? { ...a, ...patch } : a));
     await this.persistAccounts();
   }
+
+  async changeUsername(newUsername: string): Promise<{ error: string | null }> {
+    const id = this._sessionId();
+    if (!id) return { error: 'No has iniciado sesión' };
+    const clean = newUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (clean.length < 2) return { error: 'Usuario mínimo 2 caracteres alfanuméricos' };
+    if (clean.length > 24) return { error: 'Usuario máximo 24 caracteres' };
+    if (this._accounts().some((a) => a.id !== id && a.username === clean)) {
+      return { error: 'Usuario ya en uso' };
+    }
+    this._accounts.set(this._accounts().map((a) => a.id === id ? { ...a, username: clean } : a));
+    await this.persistAccounts();
+    return { error: null };
+  }
+
+  async changeEmail(newEmail: string, currentPassword: string): Promise<{ error: string | null }> {
+    const id = this._sessionId();
+    if (!id) return { error: 'No has iniciado sesión' };
+    const email = newEmail.trim().toLowerCase();
+    if (!email.includes('@') || email.length < 5) return { error: 'Email inválido' };
+
+    const acc = this._accounts().find((a) => a.id === id);
+    if (!acc) return { error: 'Cuenta no encontrada' };
+    const hash = await this.crypto.hash(currentPassword, acc.salt);
+    if (hash !== acc.passwordHash) return { error: 'Contraseña actual incorrecta' };
+
+    if (this._accounts().some((a) => a.id !== id && a.email === email)) {
+      return { error: 'Email ya registrado' };
+    }
+    this._accounts.set(this._accounts().map((a) => a.id === id ? { ...a, email } : a));
+    await this.persistAccounts();
+    return { error: null };
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ error: string | null }> {
+    const id = this._sessionId();
+    if (!id) return { error: 'No has iniciado sesión' };
+    if (newPassword.length < 6) return { error: 'Contraseña nueva mínimo 6 caracteres' };
+    const acc = this._accounts().find((a) => a.id === id);
+    if (!acc) return { error: 'Cuenta no encontrada' };
+    const hashOld = await this.crypto.hash(currentPassword, acc.salt);
+    if (hashOld !== acc.passwordHash) return { error: 'Contraseña actual incorrecta' };
+    if (currentPassword === newPassword) return { error: 'La nueva contraseña debe ser diferente' };
+
+    const newSalt = this.crypto.randomSalt();
+    const newHash = await this.crypto.hash(newPassword, newSalt);
+    this._accounts.set(this._accounts().map((a) =>
+      a.id === id ? { ...a, salt: newSalt, passwordHash: newHash } : a
+    ));
+    await this.persistAccounts();
+    return { error: null };
+  }
 }
