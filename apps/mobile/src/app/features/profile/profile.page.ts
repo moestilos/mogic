@@ -20,11 +20,11 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
   imports: [IonContent, LowerCasePipe, NgClass, AnimatedBackgroundComponent, IconComponent, PlayerCardComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
-      <div class="min-h-screen px-5 md:px-12 lg:px-24 pt-[max(env(safe-area-inset-top),1.5rem)] pb-[max(env(safe-area-inset-bottom),2rem)] max-w-4xl mx-auto relative"
+      <div class="min-h-screen px-4 md:px-12 lg:px-24 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)] max-w-4xl mx-auto relative"
            style="background: var(--bg-base);">
         <app-animated-background></app-animated-background>
 
-        <header class="mb-5 relative z-10 flex items-center justify-between gap-3">
+        <header class="mb-4 relative z-10 flex items-center justify-between gap-2">
           <button class="profile-icon-btn" (click)="back()" aria-label="Atrás">
             <crown-icon name="ChevronLeft" [size]="18"></crown-icon>
           </button>
@@ -36,23 +36,23 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 
         @if (auth.me(); as me) {
           <!-- Hero card -->
-          <div class="profile-hero relative z-10 mb-5">
+          <div class="profile-hero relative z-10 mb-4">
             <div class="profile-hero-stripe" [ngClass]="me.color | lowercase"></div>
-            <div class="flex items-center gap-4 p-5">
+            <div class="flex items-center gap-3 p-4">
               <div class="profile-avatar">
-                <crown-icon [name]="$any(me.avatar)" [size]="40" [strokeWidth]="1.2"></crown-icon>
+                <crown-icon [name]="$any(me.avatar)" [size]="32" [strokeWidth]="1.2"></crown-icon>
               </div>
               <div class="flex-1 min-w-0">
                 <div class="crown-display profile-hero-name truncate">{{ me.displayName }}</div>
-                <div class="flex items-center gap-2 mt-1 flex-wrap">
-                  <div class="profile-handle">&#64;{{ me.username }}</div>
+                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <div class="profile-handle truncate">&#64;{{ me.username }}</div>
                   <div class="profile-color-chip">
                     <div class="crown-pip" [ngClass]="me.color | lowercase"></div>
                     {{ me.color }}
                   </div>
                 </div>
               </div>
-              <button class="profile-icon-btn" (click)="openEdit()" aria-label="Editar perfil">
+              <button class="profile-icon-btn shrink-0" (click)="openEdit()" aria-label="Editar perfil">
                 <crown-icon name="Settings" [size]="16"></crown-icon>
               </button>
             </div>
@@ -480,78 +480,101 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
     .profile-hero-stripe.c { background: linear-gradient(180deg, #d8d8e0, #8b8b9e); }
 
     .profile-avatar {
-      width: 72px; height: 72px;
-      border-radius: 18px;
+      width: 56px; height: 56px;
+      border-radius: 14px;
       background: rgba(255,255,255,0.06);
       border: 1px solid var(--divider);
       display: flex; align-items: center; justify-content: center;
       color: var(--text-hi);
       flex-shrink: 0;
     }
+    @media (min-width: 480px) {
+      .profile-avatar { width: 64px; height: 64px; border-radius: 16px; }
+    }
     [data-theme='brutal'] .profile-avatar { border-radius: 0; border-width: 1.5px; }
     [data-theme='chrome'] .profile-avatar { background: linear-gradient(135deg, rgba(255,158,208,0.1), rgba(179,157,255,0.1), rgba(157,210,255,0.08)); border-color: rgba(179,157,255,0.3); }
     [data-theme='sigil']  .profile-avatar { background: rgba(201,162,86,0.08); border-color: rgba(201,162,86,0.4); color: var(--accent-flat); }
 
-    .profile-hero-name { font-size: clamp(28px, 6vw, 38px); letter-spacing: -0.03em; line-height: 1.05; }
+    .profile-hero-name {
+      font-size: clamp(22px, 5.5vw, 34px);
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
     .profile-handle {
       font-family: var(--font-hud);
-      font-size: 11px;
-      letter-spacing: 0.06em;
+      font-size: 10px;
+      letter-spacing: 0.04em;
       color: var(--text-lo);
-      padding: 3px 8px;
+      padding: 2px 7px;
       background: rgba(255,255,255,0.04);
       border-radius: 99px;
+      max-width: 100%;
     }
     .profile-color-chip {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; gap: 4px;
       font-family: var(--font-hud);
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: 9px;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--text-mid);
-      padding: 3px 8px;
+      padding: 2px 7px;
       background: rgba(255,255,255,0.04);
       border-radius: 99px;
+      flex-shrink: 0;
     }
 
     .profile-hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--divider); }
-    .profile-hero-stat { padding: 12px 8px; text-align: center; border-right: 1px solid var(--divider); }
+    .profile-hero-stat { padding: 10px 4px; text-align: center; border-right: 1px solid var(--divider); }
     .profile-hero-stat:last-child { border-right: none; }
     .profile-hero-stat-num {
       font-family: var(--font-life); font-weight: var(--life-weight);
-      font-size: 24px; letter-spacing: -0.03em;
+      font-size: 20px; letter-spacing: -0.03em;
       font-variant-numeric: tabular-nums; color: var(--text-hi); line-height: 1;
     }
+    @media (min-width: 480px) {
+      .profile-hero-stat { padding: 12px 8px; }
+      .profile-hero-stat-num { font-size: 24px; }
+    }
     .profile-hero-stat-label {
-      font-family: var(--font-hud); font-size: 9px;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--text-lo); margin-top: 5px;
+      font-family: var(--font-hud); font-size: 8px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-lo); margin-top: 4px;
+    }
+    @media (min-width: 480px) {
+      .profile-hero-stat-label { font-size: 9px; letter-spacing: 0.22em; }
     }
 
     .profile-tabs {
-      display: flex; gap: 6px; padding: 4px;
+      display: flex; gap: 4px; padding: 3px;
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--divider);
       border-radius: 12px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
+    .profile-tabs::-webkit-scrollbar { display: none; }
     [data-theme='stark'] .profile-tabs { background: rgba(20,20,14,0.03); }
     [data-theme='brutal'] .profile-tabs { border-radius: 0; padding: 0; gap: 0; }
     .profile-tab {
-      flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 10px 8px;
+      flex: 1 0 auto;
+      min-width: 0;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 9px 10px;
       background: transparent;
       border: none;
       color: var(--text-lo);
       font-family: var(--font-btn);
-      font-size: 11px;
-      letter-spacing: 0.18em;
+      font-size: 10px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       border-radius: 8px;
       cursor: pointer;
       white-space: nowrap;
       transition: background 180ms ease, color 180ms ease;
+    }
+    @media (min-width: 480px) {
+      .profile-tab { font-size: 11px; padding: 10px 12px; letter-spacing: 0.18em; }
     }
     [data-theme='brutal'] .profile-tab { border-radius: 0; border-right: 1.5px solid var(--text-hi); }
     [data-theme='brutal'] .profile-tab:last-child { border-right: none; }
@@ -575,13 +598,13 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 
     .profile-search {
       display: flex; align-items: center; gap: 8px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       background: var(--bg-input);
       border: 1px solid var(--divider);
       border-radius: var(--input-radius);
     }
     .profile-search-input {
-      flex: 1; background: transparent; border: none; outline: none;
+      flex: 1; min-width: 0; background: transparent; border: none; outline: none;
       color: var(--text-hi); font-family: var(--font-name); font-size: 14px;
     }
     .profile-search-input::placeholder { color: var(--text-lo); }
@@ -600,17 +623,24 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
     .profile-empty-sub { font-size: 12px; color: var(--text-lo); margin-top: 4px; line-height: 1.45; }
 
     .profile-request {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 14px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px;
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--divider);
       border-radius: var(--pod-radius);
+      min-width: 0;
+    }
+    @media (min-width: 480px) {
+      .profile-request { gap: 10px; padding: 12px 14px; }
     }
     [data-theme='stark'] .profile-request { background: rgba(20,20,14,0.03); }
     .profile-suggest-avatar {
-      width: 36px; height: 36px; background: var(--bg-input);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; background: var(--bg-input);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
       color: var(--text-hi); flex-shrink: 0;
+    }
+    @media (min-width: 480px) {
+      .profile-suggest-avatar { width: 36px; height: 36px; border-radius: 10px; }
     }
     [data-theme='brutal'] .profile-suggest-avatar { border-radius: 0; }
     .profile-suggest-name {
