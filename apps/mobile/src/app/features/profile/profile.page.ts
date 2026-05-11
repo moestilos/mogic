@@ -4,6 +4,7 @@ import { IonContent } from '@ionic/angular/standalone';
 import { LowerCasePipe, NgClass } from '@angular/common';
 import type { ManaColor } from '@crown/game-engine';
 import { ProfileStore } from '../../core/stores/profile.store';
+import { AuthStore } from '../../core/stores/auth.store';
 import { HapticsService } from '../../core/services/haptics.service';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
@@ -163,6 +164,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 })
 export class ProfilePage implements OnInit {
   readonly store = inject(ProfileStore);
+  private readonly auth = inject(AuthStore);
   private readonly router = inject(Router);
   private readonly haptics = inject(HapticsService);
 
@@ -201,6 +203,11 @@ export class ProfilePage implements OnInit {
   }
 
   async remove(id: string) { void this.haptics.warning(); await this.store.removeFriend(id); }
-  async signOut() { void this.haptics.warning(); await this.store.signOut(); void this.router.navigate(['/sign-in']); }
+  async signOut() {
+    void this.haptics.warning();
+    await this.auth.logout();
+    await this.store.signOut();
+    void this.router.navigate(['/sign-in']);
+  }
   back() { void this.router.navigate(['/']); }
 }
