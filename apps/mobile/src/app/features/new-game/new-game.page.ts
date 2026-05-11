@@ -10,6 +10,9 @@ import { HapticsService } from '../../core/services/haptics.service';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
 
+type GameMode = 'real' | 'casual';
+const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
+
 interface Slot {
   name: string;
   color: ManaColor;
@@ -33,8 +36,34 @@ interface Slot {
             <crown-icon name="ChevronLeft" [size]="14"></crown-icon> Atrás
           </button>
           <h1 class="crown-display text-4xl">Nueva partida</h1>
-          <p class="crown-text-lo text-sm mt-1">Solo amigos registrados pueden jugar</p>
         </header>
+
+        <!-- MODE TOGGLE: real / casual -->
+        <section class="mb-5 relative z-10">
+          <div class="crown-hud mb-3 flex items-center gap-1.5">
+            <crown-icon name="Users" [size]="11"></crown-icon> Modo
+          </div>
+          <div class="mode-toggle">
+            <button class="mode-btn"
+                    [class.is-on]="mode() === 'real'"
+                    (click)="setMode('real')">
+              <crown-icon name="UserPlus" [size]="14"></crown-icon>
+              <div class="mode-btn-body">
+                <div class="mode-btn-title">Amigos reales</div>
+                <div class="mode-btn-sub">Las wins cuentan en stats</div>
+              </div>
+            </button>
+            <button class="mode-btn"
+                    [class.is-on]="mode() === 'casual'"
+                    (click)="setMode('casual')">
+              <crown-icon name="Dice5" [size]="14"></crown-icon>
+              <div class="mode-btn-body">
+                <div class="mode-btn-title">Casual / inventados</div>
+                <div class="mode-btn-sub">Solo jugar, sin tracking</div>
+              </div>
+            </button>
+          </div>
+        </section>
 
         <section class="mb-5 relative z-10">
           <div class="crown-hud mb-3">Jugadores</div>
@@ -69,45 +98,77 @@ interface Slot {
             </div>
           </div>
 
-          <div class="flex flex-col gap-2">
-            @for (s of slots(); track $index; let i = $index) {
-              <div class="slot" [class.slot--empty]="!s.source" [class.slot--locked]="s.source === 'me'">
-                <div class="slot-index">{{ i + 1 }}</div>
-                @if (s.source) {
-                  <div class="slot-avatar">
-                    <crown-icon [name]="$any(s.avatar)" [size]="18"></crown-icon>
-                  </div>
-                  <div class="crown-pip" [ngClass]="s.color | lowercase"></div>
-                  <div class="flex-1 min-w-0">
-                    <div class="slot-name">{{ s.name }}</div>
-                    <div class="slot-tag">
-                      @if (s.source === 'me') { Tú · cuenta } @else { Amigo }
+          <!-- REAL MODE -->
+          @if (mode() === 'real') {
+            <div class="flex flex-col gap-2">
+              @for (s of slots(); track $index; let i = $index) {
+                <div class="slot" [class.slot--empty]="!s.source" [class.slot--locked]="s.source === 'me'">
+                  <div class="slot-index">{{ i + 1 }}</div>
+                  @if (s.source) {
+                    <div class="slot-avatar">
+                      <crown-icon [name]="$any(s.avatar)" [size]="18"></crown-icon>
                     </div>
-                  </div>
-                  @if (s.source !== 'me') {
-                    <button class="crown-btn-ghost px-2 py-1" (click)="clearSlot(i)" aria-label="Quitar">
-                      <crown-icon name="X" [size]="14"></crown-icon>
+                    <div class="crown-pip" [ngClass]="s.color | lowercase"></div>
+                    <div class="flex-1 min-w-0">
+                      <div class="slot-name">{{ s.name }}</div>
+                      <div class="slot-tag">
+                        @if (s.source === 'me') { Tú · cuenta } @else { Amigo }
+                      </div>
+                    </div>
+                    @if (s.source !== 'me') {
+                      <button class="crown-btn-ghost px-2 py-1" (click)="clearSlot(i)" aria-label="Quitar">
+                        <crown-icon name="X" [size]="14"></crown-icon>
+                      </button>
+                    }
+                  } @else {
+                    <button class="slot-empty-btn" (click)="openPickerFor(i)">
+                      <crown-icon name="UserPlus" [size]="14"></crown-icon>
+                      <span>Seleccionar amigo</span>
                     </button>
                   }
-                } @else {
-                  <button class="slot-empty-btn" (click)="openPickerFor(i)">
-                    <crown-icon name="UserPlus" [size]="14"></crown-icon>
-                    <span>Seleccionar amigo</span>
+                </div>
+              }
+            </div>
+
+            @if (availableFriends().length === 0 && needsMoreFriends()) {
+              <div class="empty-card mt-4">
+                <crown-icon name="Users" [size]="36" [strokeWidth]="1.25" cls="crown-text-lo"></crown-icon>
+                <p class="empty-title">Necesitas amigos</p>
+                <p class="empty-sub">O cambia a modo Casual para jugar con nombres inventados.</p>
+                <div class="flex gap-2 justify-center mt-3">
+                  <button class="crown-btn px-4 py-2 text-[11px] uppercase tracking-widest"
+                          (click)="setMode('casual')">Casual</button>
+                  <button class="crown-btn-primary px-4 py-2 text-[11px] uppercase tracking-widest flex items-center gap-1"
+                          (click)="goAddFriends()">
+                    <crown-icon name="UserPlus" [size]="11"></crown-icon> Añadir amigos
                   </button>
-                }
+                </div>
               </div>
             }
-          </div>
+          }
 
-          @if (availableFriends().length === 0 && needsMoreFriends()) {
-            <div class="profile-empty mt-4">
-              <crown-icon name="Users" [size]="36" [strokeWidth]="1.25" cls="crown-text-lo"></crown-icon>
-              <p class="profile-empty-title">Necesitas amigos</p>
-              <p class="profile-empty-sub">Para jugar con {{ count() }} jugadores necesitas añadir al menos {{ count() - 1 }} amigos registrados.</p>
-              <button class="crown-btn-primary mt-4 px-5 py-3 text-xs uppercase tracking-widest flex items-center gap-2 mx-auto"
-                      (click)="goAddFriends()">
-                <crown-icon name="UserPlus" [size]="14"></crown-icon> Buscar amigos
-              </button>
+          <!-- CASUAL MODE -->
+          @if (mode() === 'casual') {
+            <div class="flex flex-col gap-2">
+              @for (s of slots(); track $index; let i = $index) {
+                <div class="slot slot--casual">
+                  <div class="slot-index">{{ i + 1 }}</div>
+                  <button class="crown-color-swatch" [ngClass]="s.color | lowercase"
+                          style="width:28px;height:28px;"
+                          (click)="cycleColorCasual(i)"
+                          aria-label="Cambiar color"></button>
+                  <input class="slot-input"
+                         [value]="s.name"
+                         (input)="renameCasual(i, $any($event.target).value)"
+                         placeholder="Nombre"
+                         maxlength="20" />
+                </div>
+              }
+            </div>
+
+            <div class="casual-note mt-3">
+              <crown-icon name="Star" [size]="12"></crown-icon>
+              <span>Las victorias <b>no contarán</b> para wins ni stats de amigos.</span>
             </div>
           }
         </section>
@@ -117,12 +178,14 @@ interface Slot {
                 (click)="start()">
           @if (canStart()) {
             Empezar partida
-          } @else {
+          } @else if (mode() === 'real') {
             Faltan {{ count() - filledCount() }} jugador{{ count() - filledCount() === 1 ? '' : 'es' }}
+          } @else {
+            Rellena los nombres
           }
         </button>
 
-        <!-- Friend picker modal -->
+        <!-- Friend picker modal (only real mode) -->
         @if (pickerOpen() !== null) {
           <div class="fixed inset-0 z-[60] flex items-end md:items-center justify-center" (click)="pickerOpen.set(null)">
             <div class="picker-backdrop"></div>
@@ -138,10 +201,10 @@ interface Slot {
               </div>
 
               @if (availableFriends().length === 0) {
-                <div class="profile-empty">
+                <div class="empty-card">
                   <crown-icon name="Users" [size]="32" cls="crown-text-lo"></crown-icon>
-                  <p class="profile-empty-title">Sin amigos disponibles</p>
-                  <p class="profile-empty-sub">Ya están todos en la mesa o no tienes amigos añadidos.</p>
+                  <p class="empty-title">Sin amigos disponibles</p>
+                  <p class="empty-sub">Ya están todos en la mesa o no tienes amigos añadidos.</p>
                 </div>
               } @else {
                 <div class="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
@@ -169,6 +232,50 @@ interface Slot {
   styles: [`
     :host { display: block; }
 
+    .mode-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .mode-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--divider);
+      border-radius: var(--pod-radius);
+      color: var(--text-mid);
+      cursor: pointer;
+      text-align: left;
+      transition: background 160ms ease, border-color 160ms ease, transform 100ms ease;
+    }
+    .mode-btn:active { transform: scale(0.98); }
+    .mode-btn:hover { background: rgba(255,255,255,0.06); }
+    [data-theme='stark'] .mode-btn { background: rgba(20,20,14,0.03); }
+    .mode-btn.is-on {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: transparent;
+    }
+    [data-theme='chrome'] .mode-btn.is-on {
+      background-size: 300% 100%;
+      animation: chromeFlow 5s linear infinite;
+    }
+    .mode-btn-body { flex: 1; min-width: 0; }
+    .mode-btn-title {
+      font-family: var(--font-name);
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .mode-btn-sub {
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
     .slot {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px;
@@ -177,11 +284,9 @@ interface Slot {
       border-radius: var(--pod-radius);
     }
     [data-theme='stark'] .slot { background: rgba(20,20,14,0.03); }
-    .slot--empty {
-      border-style: dashed;
-      background: rgba(255,255,255,0.01);
-    }
+    .slot--empty { border-style: dashed; background: rgba(255,255,255,0.01); }
     .slot--locked { border-color: var(--accent-flat); box-shadow: var(--accent-glow); }
+    .slot--casual { gap: 12px; }
     .slot-index {
       width: 24px; height: 24px;
       border-radius: 99px;
@@ -215,6 +320,17 @@ interface Slot {
       color: var(--text-lo);
       margin-top: 2px;
     }
+    .slot-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-hi);
+      font-family: var(--font-name);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .slot-input::placeholder { color: var(--text-lo); }
     .slot-empty-btn {
       flex: 1;
       display: flex; align-items: center; gap: 8px;
@@ -229,18 +345,30 @@ interface Slot {
     }
     .slot-empty-btn:hover { color: var(--text-hi); }
 
-    .profile-empty {
+    .casual-note {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: rgba(255,213,106,0.06);
+      border: 1px dashed var(--warn);
+      border-radius: var(--input-radius);
+      color: var(--warn);
+      font-size: 12px;
+      font-family: var(--font-body);
+    }
+    .casual-note b { color: var(--text-hi); }
+
+    .empty-card {
       text-align: center; padding: 24px 20px;
       background: rgba(255,255,255,0.02);
       border: 1px dashed var(--divider);
       border-radius: var(--pod-radius);
     }
-    [data-theme='brutal'] .profile-empty { border-radius: 0; border-style: solid; border-width: 1.5px; }
-    .profile-empty-title {
+    [data-theme='brutal'] .empty-card { border-radius: 0; border-style: solid; border-width: 1.5px; }
+    .empty-title {
       font-family: var(--font-display); font-weight: var(--life-weight);
       font-size: 16px; color: var(--text-mid); margin-top: 10px;
     }
-    .profile-empty-sub { font-size: 12px; color: var(--text-lo); margin-top: 4px; line-height: 1.45; }
+    .empty-sub { font-size: 12px; color: var(--text-lo); margin-top: 4px; line-height: 1.45; }
 
     .picker-backdrop {
       position: fixed; inset: 0;
@@ -269,7 +397,6 @@ interface Slot {
       margin-top: 4px;
       color: #f5f5fa;
     }
-
     .profile-icon-btn {
       width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
@@ -279,7 +406,6 @@ interface Slot {
       color: #c4c4d0;
       cursor: pointer;
     }
-
     .friend-row {
       width: 100%;
       display: flex; align-items: center; gap: 10px;
@@ -309,12 +435,17 @@ export class NewGamePage implements OnInit {
     { id: 'oathbreaker', label: 'Oathbreaker', life: 20 },
   ];
 
+  readonly mode = signal<GameMode>('real');
   readonly count = signal(4);
   readonly format = signal<GameFormat>('commander');
   readonly slots = signal<Slot[]>([]);
   readonly pickerOpen = signal<number | null>(null);
 
-  readonly filledCount = computed(() => this.slots().filter((s) => s.source !== null).length);
+  readonly filledCount = computed(() => {
+    const m = this.mode();
+    if (m === 'casual') return this.slots().filter((s) => s.name.trim().length > 0).length;
+    return this.slots().filter((s) => s.source !== null).length;
+  });
 
   readonly assignedFriendIds = computed(() => {
     const ids: string[] = [];
@@ -344,14 +475,25 @@ export class NewGamePage implements OnInit {
     this.initSlots(this.count());
   }
 
+  setMode(m: GameMode) {
+    if (this.mode() === m) return;
+    void this.haptics.medium();
+    this.mode.set(m);
+    this.initSlots(this.count());
+  }
+
   private initSlots(n: number) {
     const me = this.auth.me();
     const arr: Slot[] = [];
-    if (me) {
-      arr.push({ name: me.displayName, color: me.color, avatar: me.avatar, source: 'me' });
-    }
-    while (arr.length < n) {
-      arr.push({ name: '', color: 'C', avatar: 'User', source: null });
+    if (this.mode() === 'real') {
+      if (me) arr.push({ name: me.displayName, color: me.color, avatar: me.avatar, source: 'me' });
+      while (arr.length < n) arr.push({ name: '', color: 'C', avatar: 'User', source: null });
+    } else {
+      // Casual: prefill first slot with user name if available, rest with Player N
+      if (me) arr.push({ name: me.displayName, color: me.color, avatar: me.avatar, source: null });
+      for (let i = arr.length; i < n; i++) {
+        arr.push({ name: `Player ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
+      }
     }
     this.slots.set(arr);
   }
@@ -362,9 +504,13 @@ export class NewGamePage implements OnInit {
     const next: Slot[] = [];
     for (let i = 0; i < n; i++) {
       if (i < current.length) next.push(current[i]);
-      else next.push({ name: '', color: 'C', avatar: 'User', source: null });
+      else if (this.mode() === 'casual') {
+        next.push({ name: `Player ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
+      } else {
+        next.push({ name: '', color: 'C', avatar: 'User', source: null });
+      }
     }
-    if (next.length > 0 && next[0].source !== 'me') {
+    if (this.mode() === 'real' && next.length > 0 && next[0].source !== 'me') {
       const me = this.auth.me();
       if (me) next[0] = { name: me.displayName, color: me.color, avatar: me.avatar, source: 'me' };
     }
@@ -394,7 +540,26 @@ export class NewGamePage implements OnInit {
     this.slots.set(arr);
   }
 
-  canStart(): boolean { return this.filledCount() === this.count(); }
+  renameCasual(idx: number, name: string) {
+    const arr = [...this.slots()];
+    arr[idx] = { ...arr[idx], name };
+    this.slots.set(arr);
+  }
+
+  cycleColorCasual(idx: number) {
+    void this.haptics.light();
+    const arr = [...this.slots()];
+    const i = COLORS.indexOf(arr[idx].color);
+    arr[idx] = { ...arr[idx], color: COLORS[(i + 1) % COLORS.length] };
+    this.slots.set(arr);
+  }
+
+  canStart(): boolean {
+    if (this.mode() === 'casual') {
+      return this.slots().every((s) => s.name.trim().length > 0);
+    }
+    return this.filledCount() === this.count();
+  }
 
   back() { void this.router.navigate(['/']); }
   goAddFriends() { void this.router.navigate(['/profile'], { queryParams: { tab: 'search' } }); }
@@ -405,10 +570,11 @@ export class NewGamePage implements OnInit {
     const slots = this.slots();
     this.store.start({
       format: this.format(),
-      players: slots.map((s) => ({ name: s.name, color: s.color })),
+      players: slots.map((s) => ({ name: s.name.trim() || `Player`, color: s.color })),
     });
     const snap = this.store.game();
-    if (snap) {
+    sessionStorage.setItem('crown.gameMode', this.mode());
+    if (snap && this.mode() === 'real') {
       const mapping: Record<string, string> = {};
       snap.players.forEach((p, i) => {
         const src = slots[i]?.source;
@@ -417,6 +583,8 @@ export class NewGamePage implements OnInit {
         }
       });
       sessionStorage.setItem('crown.playerToFriend', JSON.stringify(mapping));
+    } else {
+      sessionStorage.removeItem('crown.playerToFriend');
     }
     void this.router.navigate(['/game']);
   }

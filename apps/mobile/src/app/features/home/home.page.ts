@@ -97,12 +97,12 @@ import { IconComponent } from '../../shared/icon.component';
         <button class="home-cta crown-pod relative z-10 w-full mb-4 text-left transition active:scale-[0.98]"
                 (click)="newGame()">
           <div class="home-cta-art">
-            <crown-icon name="Sparkles" [size]="56" [strokeWidth]="1.25" cls="home-cta-icon"></crown-icon>
+            <crown-icon name="Swords" [size]="56" [strokeWidth]="1.25" cls="home-cta-icon"></crown-icon>
           </div>
           <div class="home-cta-body">
-            <div class="crown-hud">Empezar partida</div>
-            <div class="home-cta-title">Quick Play</div>
-            <div class="home-cta-sub">2-6 jugadores · 3 taps</div>
+            <div class="crown-hud">Empezar mesa</div>
+            <div class="home-cta-title">Nueva partida</div>
+            <div class="home-cta-sub">2-6 jugadores</div>
           </div>
           <div class="home-cta-arrow">
             <crown-icon name="ChevronLeft" [size]="20" style="transform: rotate(180deg);"></crown-icon>

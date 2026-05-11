@@ -400,9 +400,9 @@ export class GamePage implements OnInit, OnDestroy {
 
   async finish() {
     const snap = this.store.game();
-    if (snap?.endedAt) {
+    const mode = sessionStorage.getItem('crown.gameMode') ?? 'real';
+    if (snap?.endedAt && mode === 'real') {
       await this.groups.registerGameResult(snap);
-      // Friend tracking
       try {
         const raw = sessionStorage.getItem('crown.playerToFriend');
         if (raw) {
@@ -414,10 +414,11 @@ export class GamePage implements OnInit, OnDestroy {
             const winnerFid = snap.winnerId ? map[snap.winnerId] : null;
             if (winnerFid) await this.profile.recordWin(winnerFid);
           }
-          sessionStorage.removeItem('crown.playerToFriend');
         }
       } catch {}
     }
+    sessionStorage.removeItem('crown.playerToFriend');
+    sessionStorage.removeItem('crown.gameMode');
     this.groups.clearActiveSession();
     await this.store.end();
     void this.router.navigate(['/']);
