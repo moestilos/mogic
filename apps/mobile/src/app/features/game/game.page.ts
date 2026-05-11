@@ -171,8 +171,7 @@ const GLOW: Record<ManaColor, string> = {
     :host { display: block; height: 100%; }
     .life-pulse { animation: lifePulse 200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
     @keyframes lifePulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
-    .tap-flash { animation: tapFlash 280ms ease-out; }
-    @keyframes tapFlash { 0% { background: rgba(255,255,255,0.18); } 100% { background: transparent; } }
+    /* No flash background — solo cambia el número (haptic + life-pulse anim hace feedback) */
   `],
 })
 export class GamePage implements OnInit, OnDestroy {
