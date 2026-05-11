@@ -6,12 +6,12 @@ import type { IconKey } from '../../shared/icons';
 interface CounterDef { key: CounterType; label: string; icon: IconKey; tint: string; }
 
 const COUNTERS: CounterDef[] = [
-  { key: 'poison',       label: 'Poison',      icon: 'Skull',          tint: 'crown-text-success' },
-  { key: 'energy',       label: 'Energy',      icon: 'Zap',            tint: 'crown-text-accent' },
-  { key: 'experience',   label: 'Experience',  icon: 'Star',           tint: 'crown-text-warn' },
-  { key: 'storm',        label: 'Storm',       icon: 'CloudLightning', tint: 'crown-text-mid' },
-  { key: 'commanderTax', label: 'Cmd Tax',     icon: 'PlusCircle',     tint: 'crown-text-mid' },
-  { key: 'rad',          label: 'Rad',         icon: 'Radiation',      tint: 'crown-text-danger' },
+  { key: 'poison',       label: 'Poison',      icon: 'Skull',          tint: '#9dffb3' },
+  { key: 'energy',       label: 'Energy',      icon: 'Zap',            tint: '#b39dff' },
+  { key: 'experience',   label: 'Experience',  icon: 'Star',           tint: '#ffe89d' },
+  { key: 'storm',        label: 'Storm',       icon: 'CloudLightning', tint: '#c4c4d0' },
+  { key: 'commanderTax', label: 'Cmd Tax',     icon: 'PlusCircle',     tint: '#c4c4d0' },
+  { key: 'rad',          label: 'Rad',         icon: 'Radiation',      tint: '#ff7a7a' },
 ];
 
 @Component({
@@ -19,68 +19,243 @@ const COUNTERS: CounterDef[] = [
   standalone: true,
   imports: [IconComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center" (click)="close.emit()">
-      <div class="crown-backdrop"></div>
-      <div class="crown-modal relative w-full max-w-2xl mx-auto p-5 pb-[max(env(safe-area-inset-bottom),1.5rem)] md:mb-8 max-h-[92vh] overflow-y-auto"
-           style="border-radius: var(--modal-radius) var(--modal-radius) 0 0;"
-           (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between mb-4">
+    <div class="fixed inset-0 z-[60] flex items-end md:items-center justify-center" (click)="close.emit()">
+      <div class="cd-backdrop"></div>
+      <div class="cd-modal" (click)="$event.stopPropagation()">
+
+        <div class="cd-header">
           <div>
-            <div class="crown-hud">Jugador</div>
-            <div class="crown-display text-2xl mt-1">{{ player.name }}</div>
+            <div class="cd-eyebrow">Jugador</div>
+            <div class="cd-name">{{ player.name }}</div>
           </div>
-          <button class="crown-btn-ghost px-3" (click)="close.emit()" aria-label="Cerrar">
-            <crown-icon name="X" [size]="22"></crown-icon>
+          <button class="cd-icon-btn" (click)="close.emit()" aria-label="Cerrar">
+            <crown-icon name="X" [size]="18"></crown-icon>
           </button>
         </div>
 
-        <div class="crown-card p-4 mb-3">
-          <div class="flex items-center justify-between mb-3">
-            <div class="crown-hud">Vida</div>
-            <div class="text-4xl"
-                 style="font-family: var(--font-life); font-weight: var(--life-weight); letter-spacing: var(--life-letter); font-variant-numeric: tabular-nums; color: var(--text-hi);">{{ player.life }}</div>
+        <!-- LIFE -->
+        <div class="cd-section">
+          <div class="cd-section-head">
+            <div class="cd-eyebrow">Vida</div>
+            <div class="cd-life-num">{{ player.life }}</div>
           </div>
-          <div class="grid grid-cols-6 gap-1.5">
-            <button class="crown-btn py-3 text-sm" (click)="changeLife.emit(-10)">−10</button>
-            <button class="crown-btn py-3 text-sm" (click)="changeLife.emit(-5)">−5</button>
-            <button class="crown-btn py-3 text-sm" (click)="changeLife.emit(-1)">−1</button>
-            <button class="crown-btn-primary py-3 text-sm" (click)="changeLife.emit(+1)">+1</button>
-            <button class="crown-btn py-3 text-sm" (click)="changeLife.emit(+5)">+5</button>
-            <button class="crown-btn py-3 text-sm" (click)="changeLife.emit(+10)">+10</button>
+          <div class="cd-life-grid">
+            <button class="cd-btn cd-btn-neg" (click)="changeLife.emit(-10)">−10</button>
+            <button class="cd-btn cd-btn-neg" (click)="changeLife.emit(-5)">−5</button>
+            <button class="cd-btn cd-btn-neg" (click)="changeLife.emit(-1)">−1</button>
+            <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+1)">+1</button>
+            <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+5)">+5</button>
+            <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+10)">+10</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+        <!-- COUNTERS -->
+        <div class="cd-counters">
           @for (c of counters; track c.key) {
-            <div class="crown-card flex items-center gap-3 p-3">
-              <div class="w-9 h-9 flex items-center justify-center" [class]="c.tint">
+            <div class="cd-counter">
+              <div class="cd-counter-icon" [style.color]="c.tint">
                 <crown-icon [name]="c.icon" [size]="20"></crown-icon>
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="text-xs truncate" style="font-family: var(--font-name); font-weight: 500;">{{ c.label }}</div>
-                <div class="text-2xl"
-                     style="font-family: var(--font-life); font-weight: var(--life-weight); letter-spacing: var(--life-letter); font-variant-numeric: tabular-nums;">{{ value(c.key) }}</div>
+              <div class="cd-counter-info">
+                <div class="cd-counter-label">{{ c.label }}</div>
+                <div class="cd-counter-value">{{ value(c.key) }}</div>
               </div>
-              <div class="flex gap-1.5">
-                <button class="crown-btn w-9 h-9 flex items-center justify-center" (click)="change.emit({ counter: c.key, delta: -1 })">
-                  <crown-icon name="Minus" [size]="16"></crown-icon>
+              <div class="cd-counter-controls">
+                <button class="cd-icon-btn cd-icon-btn-sm" (click)="change.emit({ counter: c.key, delta: -1 })" aria-label="Restar">
+                  <crown-icon name="Minus" [size]="14"></crown-icon>
                 </button>
-                <button class="crown-btn-primary w-9 h-9 flex items-center justify-center" (click)="change.emit({ counter: c.key, delta: +1 })">
-                  <crown-icon name="Plus" [size]="16"></crown-icon>
+                <button class="cd-icon-btn cd-icon-btn-sm cd-icon-btn-primary" (click)="change.emit({ counter: c.key, delta: +1 })" aria-label="Sumar">
+                  <crown-icon name="Plus" [size]="14"></crown-icon>
                 </button>
               </div>
             </div>
           }
         </div>
 
-        <button
-          class="crown-btn-danger w-full py-3 text-xs uppercase tracking-widest flex items-center justify-center gap-2"
-          (click)="openCmdDamage.emit()">
-          <crown-icon name="Swords" [size]="14"></crown-icon> Commander Damage
+        <button class="cd-cmd-btn" (click)="openCmdDamage.emit()">
+          <crown-icon name="Swords" [size]="14"></crown-icon>
+          <span>Commander Damage</span>
         </button>
       </div>
     </div>
   `,
+  styles: [`
+    :host { display: block; }
+
+    .cd-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 0;
+    }
+    .cd-modal {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 32rem;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 22px 22px 22px;
+      background: #0c0c12;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px 22px 0 0;
+      color: #e8e8f0;
+      margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      .cd-modal { border-radius: 22px; margin-bottom: 2rem; max-width: 40rem; }
+    }
+
+    .cd-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .cd-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #7a7a90;
+    }
+    .cd-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: #f5f5fa;
+      margin-top: 4px;
+    }
+    .cd-icon-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #c4c4d0;
+      cursor: pointer;
+      transition: background 160ms ease, transform 100ms ease;
+    }
+    .cd-icon-btn:hover { background: rgba(255,255,255,0.1); }
+    .cd-icon-btn:active { transform: scale(0.92); }
+    .cd-icon-btn-sm {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+    }
+    .cd-icon-btn-primary {
+      background: linear-gradient(115deg, #ff9ed0, #b39dff, #9dd2ff, #9dffb3, #ffe89d);
+      background-size: 300% 100%;
+      color: #08080a;
+      border-color: transparent;
+      animation: chromeFlow 5s linear infinite;
+    }
+    .cd-icon-btn-primary:hover { background-size: 300% 100%; }
+
+    .cd-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .cd-section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .cd-life-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 300;
+      font-size: 38px;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      color: #f5f5fa;
+      line-height: 1;
+    }
+    .cd-life-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+    .cd-btn {
+      padding: 14px 6px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      color: #e8e8f0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 160ms ease, transform 100ms ease, border-color 160ms ease;
+    }
+    .cd-btn:active { transform: scale(0.95); }
+    .cd-btn-neg:hover { background: rgba(255,122,122,0.12); border-color: rgba(255,122,122,0.4); color: #ff9e9e; }
+    .cd-btn-pos:hover { background: rgba(157,255,179,0.12); border-color: rgba(157,255,179,0.4); color: #9dffb3; }
+
+    .cd-counters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 480px) {
+      .cd-counters { grid-template-columns: 1fr; }
+    }
+    .cd-counter {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+    }
+    .cd-counter-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cd-counter-info { flex: 1; min-width: 0; }
+    .cd-counter-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      color: #c4c4d0;
+    }
+    .cd-counter-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #f5f5fa;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .cd-counter-controls { display: flex; gap: 5px; }
+
+    .cd-cmd-btn {
+      width: 100%;
+      padding: 12px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: rgba(255,122,122,0.08);
+      border: 1px solid rgba(255,122,122,0.35);
+      border-radius: 12px;
+      color: #ff9e9e;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 160ms ease;
+    }
+    .cd-cmd-btn:hover { background: rgba(255,122,122,0.15); }
+
+    @keyframes chromeFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+  `],
 })
 export class CounterDrawerComponent {
   @Input({ required: true }) player!: Player;
