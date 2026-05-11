@@ -1271,3 +1271,165 @@ ion-content { --background: var(--bg-base); --color: var(--text-hi); }
 .crown-text-warn   { color: var(--warn); }
 .crown-text-success { color: var(--success); }
 .crown-text-accent  { color: var(--accent-flat); }
+
+/* ════════════════════════════════════════════════════════════════
+   AUDIT POLISH — per-theme corrections (UI/UX QA pass)
+   Apply consistency, contrast, accessibility fixes per theme.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── STARK (light mode) ── */
+[data-theme='stark'] {
+  --text-mid: #3a3a32;       /* was #2a2a22 — improve contrast on light bg */
+  --bg-input: rgba(20,20,14,0.05);
+  --divider: rgba(20,20,14,0.14);
+}
+[data-theme='stark'] .crown-pod,
+[data-theme='stark'] .home-tile,
+[data-theme='stark'] .home-resume,
+[data-theme='stark'] .home-cta,
+[data-theme='stark'] .home-stat,
+[data-theme='stark'] .home-theme-row,
+[data-theme='stark'] .profile-hero,
+[data-theme='stark'] .profile-stat-card,
+[data-theme='stark'] .profile-suggest,
+[data-theme='stark'] .profile-request,
+[data-theme='stark'] .profile-setting,
+[data-theme='stark'] .crown-card {
+  background: #ffffff;
+  border: 1px solid rgba(20,20,14,0.14);
+  box-shadow: 0 1px 3px rgba(20,20,14,0.05);
+}
+[data-theme='stark'] .crown-btn {
+  background: #ffffff;
+  border: 1px solid #14140e;
+  color: #14140e;
+}
+[data-theme='stark'] .crown-btn:hover { background: #f5f5f0; }
+[data-theme='stark'] .crown-btn-primary { background: #14140e; color: #fafaf6; }
+[data-theme='stark'] .crown-input {
+  background: #ffffff;
+  border: 1px solid rgba(20,20,14,0.18);
+  color: #14140e;
+}
+[data-theme='stark'] .crown-input::placeholder { color: #888880; }
+[data-theme='stark'] .profile-tab.is-on,
+[data-theme='stark'] .edit-tab.is-on { color: #fafaf6; }
+
+/* ── BRUTAL ── */
+[data-theme='brutal'] .crown-input,
+[data-theme='brutal'] .edit-input,
+[data-theme='brutal'] .profile-search { border-width: 1.5px; }
+[data-theme='brutal'] .home-stat-num,
+[data-theme='brutal'] .profile-stat-num,
+[data-theme='brutal'] .profile-hero-stat-num {
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+}
+[data-theme='brutal'] .home-tile-title,
+[data-theme='brutal'] .home-cta-title,
+[data-theme='brutal'] .crown-display {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 700 !important;
+}
+[data-theme='brutal'] .crown-btn:hover,
+[data-theme='brutal'] .profile-icon-btn:hover {
+  background: var(--text-hi) !important;
+  color: var(--bg-base) !important;
+}
+
+/* ── VAPOR ── */
+[data-theme='vapor'] {
+  --divider: rgba(255,255,255,0.1);
+  --text-mid: #e0d8f0;
+  --text-lo: #a8a0bd;
+}
+[data-theme='vapor'] .home-tile,
+[data-theme='vapor'] .home-resume,
+[data-theme='vapor'] .home-cta,
+[data-theme='vapor'] .home-stat,
+[data-theme='vapor'] .home-theme-row,
+[data-theme='vapor'] .profile-hero,
+[data-theme='vapor'] .profile-stat-card,
+[data-theme='vapor'] .profile-suggest,
+[data-theme='vapor'] .profile-request,
+[data-theme='vapor'] .profile-setting,
+[data-theme='vapor'] .crown-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset;
+}
+
+/* ── EDITORIAL ── */
+[data-theme='editorial'] {
+  --text-mid: #d0d0d2;
+  --divider: #2a2a30;
+}
+[data-theme='editorial'] .home-tile,
+[data-theme='editorial'] .home-resume,
+[data-theme='editorial'] .home-cta,
+[data-theme='editorial'] .home-stat,
+[data-theme='editorial'] .home-theme-row,
+[data-theme='editorial'] .profile-stat-card,
+[data-theme='editorial'] .profile-suggest,
+[data-theme='editorial'] .profile-request,
+[data-theme='editorial'] .profile-setting,
+[data-theme='editorial'] .crown-card {
+  background: transparent;
+  border: 1px solid #2a2a30;
+  box-shadow: none;
+}
+
+/* ── SIGIL ── */
+[data-theme='sigil'] {
+  --text-mid: #d4cab0;
+}
+[data-theme='sigil'] .home-tile,
+[data-theme='sigil'] .home-resume,
+[data-theme='sigil'] .home-cta,
+[data-theme='sigil'] .home-stat,
+[data-theme='sigil'] .profile-stat-card,
+[data-theme='sigil'] .crown-card {
+  background: rgba(201,162,86,0.03);
+  border: 1px solid rgba(201,162,86,0.2);
+}
+
+/* ── CHROME (default polish) ── */
+[data-theme='chrome'] .home-cta-art,
+[data-theme='chrome'] .home-resume-icon {
+  border-color: rgba(179,157,255,0.25);
+}
+
+/* ── UNIVERSAL FIXES across all themes ── */
+
+/* Ensure hover/focus state for clickable items */
+.crown-btn:focus-visible,
+.crown-btn-primary:focus-visible,
+.crown-pod:focus-visible {
+  outline: 2px solid var(--accent-flat);
+  outline-offset: 2px;
+}
+
+/* Consistent disabled state */
+.crown-btn:disabled,
+.crown-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Tap highlight remove */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Smooth scrolling lists */
+.scrollable, ion-content { scroll-behavior: smooth; }
+
+/* Prevent text overflow */
+.crown-display, .crown-pod-name, .home-tile-title, .profile-hero-name {
+  overflow-wrap: anywhere;
+}
+
+/* Min line-height for readability */
+.crown-pod-name, .crown-text-hi, .crown-text-mid { line-height: 1.35; }
+
