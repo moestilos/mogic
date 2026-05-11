@@ -221,7 +221,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 <crown-icon name="Search" [size]="15" cls="crown-text-lo"></crown-icon>
                 <input class="profile-search-input"
                        [value]="searchQuery()"
-                       (input)="searchQuery.set($any($event.target).value)"
+                       (input)="onSearchChange($any($event.target).value)"
                        placeholder="Busca por nombre, &#64;usuario o email..."
                        autocapitalize="off" />
                 @if (searchQuery().length > 0) {
@@ -946,12 +946,29 @@ export class ProfilePage implements OnInit {
   readonly searchResults = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     if (q.length < 1) return [];
+    // Remote results take priority when API enabled, supplemented with email field hidden
+    const remote = this.requests.searchResults();
+    if (remote.length > 0) {
+      return remote.map((u) => ({
+        id: u.id, email: '', username: u.username, displayName: u.displayName,
+        color: u.color, avatar: u.avatar,
+      }));
+    }
     return this.auth.otherAccounts().filter((a) =>
       a.displayName.toLowerCase().includes(q) ||
       a.username.toLowerCase().includes(q) ||
       a.email.toLowerCase().includes(q)
     );
   });
+
+  private searchDebounce: ReturnType<typeof setTimeout> | null = null;
+  onSearchChange(v: string) {
+    this.searchQuery.set(v);
+    if (this.searchDebounce) clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => {
+      void this.requests.searchUsers(v);
+    }, 250);
+  }
 
   async ngOnInit() {
     await this.auth.load();

@@ -381,9 +381,8 @@ export class GamePage implements OnInit, OnDestroy {
           const friendIds = Object.values(map);
           if (friendIds.length > 0) {
             await this.profile.load();
-            await this.profile.recordParticipation(friendIds);
-            const winnerFid = snap.winnerId ? map[snap.winnerId] : null;
-            if (winnerFid) await this.profile.recordWin(winnerFid);
+            const winnerFid = snap.winnerId ? map[snap.winnerId] : undefined;
+            await this.profile.recordGameRemote(winnerFid, friendIds);
           }
         }
       } catch {}

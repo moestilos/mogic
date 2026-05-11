@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import type { ManaColor } from '@crown/game-engine';
+import { ApiService } from '../services/api.service';
 
 export interface MyProfile {
   id: string;
@@ -35,6 +36,7 @@ const uid = (): string =>
 
 @Injectable({ providedIn: 'root' })
 export class ProfileStore {
+  private readonly api = inject(ApiService);
   private readonly _me = signal<MyProfile | null>(null);
   private readonly _friends = signal<Friend[]>([]);
   private readonly _loaded = signal(false);
@@ -62,6 +64,25 @@ export class ProfileStore {
   }
 
   private async loadFriends(): Promise<void> {
+    if (this.api.enabled) {
+      try {
+        const remote = await this.api.listFriends();
+        const mapped: Friend[] = remote.map((r) => ({
+          id: r.id,
+          accountId: r.friendUserId ?? undefined,
+          name: r.displayName,
+          color: r.color,
+          avatar: r.avatar,
+          wins: r.wins,
+          games: r.games,
+          addedAt: new Date(r.addedAt).getTime(),
+        }));
+        this._friends.set(mapped);
+        return;
+      } catch (e) {
+        console.warn('[mogic] listFriends failed, fallback local', e);
+      }
+    }
     const { value } = await Preferences.get({ key: friendsKeyFor(this._scope) });
     if (value) {
       try { this._friends.set(JSON.parse(value) as Friend[]); return; } catch {}
@@ -70,6 +91,7 @@ export class ProfileStore {
   }
 
   private async persistFriends(): Promise<void> {
+    if (this.api.enabled) return; // Server is source of truth
     await Preferences.set({ key: friendsKeyFor(this._scope), value: JSON.stringify(this._friends()) });
   }
 
@@ -106,8 +128,23 @@ export class ProfileStore {
 
   async addFriend(name: string, color: ManaColor, avatar = 'User', accountId?: string): Promise<Friend> {
     if (accountId && this.hasFriendForAccount(accountId)) {
-      return this._friends().find((f) => f.accountId === accountId)!;
+      const existing = this._friends().find((f) => f.accountId === accountId);
+      if (existing) return existing;
     }
+
+    if (this.api.enabled) {
+      try {
+        const r = await this.api.addFriend({ displayName: name.trim(), color, avatar });
+        const friend: Friend = {
+          id: r.id, accountId: r.friendUserId ?? accountId,
+          name: r.displayName, color: r.color, avatar: r.avatar,
+          wins: r.wins, games: r.games, addedAt: new Date(r.addedAt).getTime(),
+        };
+        this._friends.set([friend, ...this._friends()]);
+        return friend;
+      } catch (e) { console.warn('[mogic] addFriend api failed', e); }
+    }
+
     const friend: Friend = {
       id: uid(),
       accountId,
@@ -125,6 +162,9 @@ export class ProfileStore {
   }
 
   async removeFriend(id: string): Promise<void> {
+    if (this.api.enabled) {
+      try { await this.api.deleteFriend(id); } catch (e) { console.warn('[mogic] deleteFriend api failed', e); }
+    }
     const next = this._friends().filter((f) => f.id !== id);
     this._friends.set(next);
     await this.persistFriends();
@@ -146,5 +186,20 @@ export class ProfileStore {
     const next = this._friends().map((f) => (friendIds.includes(f.id) ? { ...f, games: f.games + 1 } : f));
     this._friends.set(next);
     await this.persistFriends();
+  }
+
+  /** Atomic record-game via API: winner + participants increment in one call. */
+  async recordGameRemote(winnerFriendId: string | undefined, participantFriendIds: string[]): Promise<void> {
+    if (!this.api.enabled) {
+      await this.recordParticipation(participantFriendIds);
+      if (winnerFriendId) await this.recordWin(winnerFriendId);
+      return;
+    }
+    try {
+      await this.api.recordGame({ winnerFriendId, participantFriendIds });
+      await this.loadFriends();
+    } catch (e) {
+      console.warn('[mogic] recordGame api failed', e);
+    }
   }
 }

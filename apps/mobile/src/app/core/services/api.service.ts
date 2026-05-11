@@ -34,6 +34,42 @@ export interface ApiGroup {
   createdAt: string;
 }
 
+export interface ApiFriendRequest {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  createdAt: string;
+  respondedAt: string | null;
+}
+
+export interface ApiUserSearchResult {
+  id: string;
+  username: string;
+  displayName: string;
+  color: 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
+  avatar: string;
+}
+
+export interface ApiGroupProfile {
+  id: string;
+  groupId: string;
+  friendId: string | null;
+  displayName: string;
+  color: 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
+  avatar: string;
+  position: number;
+}
+
+export interface ApiGroupResult {
+  id: string;
+  groupId: string;
+  format: string;
+  startedAt: string;
+  endedAt: string;
+  placements: { profileId: string; placement: number }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   readonly enabled = API_ENABLED;
@@ -122,6 +158,39 @@ export class ApiService {
     await this.req('/api/friends/record-game', { method: 'POST', body: input });
   }
 
+  async patchFriend(id: string, patch: Partial<Pick<ApiFriend, 'displayName' | 'color' | 'avatar'>>): Promise<ApiFriend> {
+    const data = await this.req<{ friend: ApiFriend }>(`/api/friends/${id}`, { method: 'PATCH', body: patch });
+    return data.friend;
+  }
+
+  // ── Friend Requests ──────────────────────────────────────
+  async searchUsers(q: string): Promise<ApiUserSearchResult[]> {
+    const data = await this.req<{ users: ApiUserSearchResult[] }>(`/api/friend-requests/search?q=${encodeURIComponent(q)}`);
+    return data.users;
+  }
+
+  async listFriendRequests(): Promise<ApiFriendRequest[]> {
+    const data = await this.req<{ requests: ApiFriendRequest[] }>('/api/friend-requests/');
+    return data.requests;
+  }
+
+  async sendFriendRequest(toUserId: string): Promise<ApiFriendRequest> {
+    const data = await this.req<{ request: ApiFriendRequest }>('/api/friend-requests/', { method: 'POST', body: { toUserId } });
+    return data.request;
+  }
+
+  async acceptFriendRequest(id: string): Promise<void> {
+    await this.req(`/api/friend-requests/${id}/accept`, { method: 'POST' });
+  }
+
+  async declineFriendRequest(id: string): Promise<void> {
+    await this.req(`/api/friend-requests/${id}/decline`, { method: 'POST' });
+  }
+
+  async cancelFriendRequest(id: string): Promise<void> {
+    await this.req(`/api/friend-requests/${id}/cancel`, { method: 'POST' });
+  }
+
   // ── Groups ───────────────────────────────────────────────
   async listGroups(): Promise<ApiGroup[]> {
     const data = await this.req<{ groups: ApiGroup[] }>('/api/groups/');
@@ -133,11 +202,25 @@ export class ApiService {
     return data.group;
   }
 
-  async getGroup(id: string): Promise<{ group: ApiGroup; profiles: unknown[]; results: unknown[] }> {
+  async getGroup(id: string): Promise<{ group: ApiGroup; profiles: ApiGroupProfile[]; results: ApiGroupResult[] }> {
     return this.req(`/api/groups/${id}`);
   }
 
   async deleteGroup(id: string): Promise<void> {
     await this.req(`/api/groups/${id}`, { method: 'DELETE' });
+  }
+
+  async addGroupProfile(groupId: string, input: { friendId?: string; displayName: string; color: string; avatar: string }): Promise<ApiGroupProfile> {
+    const data = await this.req<{ profile: ApiGroupProfile }>(`/api/groups/${groupId}/profiles`, { method: 'POST', body: input });
+    return data.profile;
+  }
+
+  async deleteGroupProfile(groupId: string, profileId: string): Promise<void> {
+    await this.req(`/api/groups/${groupId}/profiles/${profileId}`, { method: 'DELETE' });
+  }
+
+  async addGroupResult(groupId: string, input: { format: string; startedAt: string; endedAt: string; placements: { profileId: string; placement: number }[] }): Promise<ApiGroupResult> {
+    const data = await this.req<{ result: ApiGroupResult }>(`/api/groups/${groupId}/results`, { method: 'POST', body: input });
+    return data.result;
   }
 }
