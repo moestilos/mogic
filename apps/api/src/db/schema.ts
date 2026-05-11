@@ -51,6 +51,18 @@ export const groupProfiles = pgTable('mogic_group_profiles', {
   groupIdx: index('mogic_group_profiles_group_idx').on(t.groupId),
 }));
 
+export const friendRequests = pgTable('mogic_friend_requests', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  fromUserId: uuid('from_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  toUserId: uuid('to_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  respondedAt: timestamp('responded_at', { withTimezone: true }),
+}, (t) => ({
+  fromIdx: index('mogic_friend_requests_from_idx').on(t.fromUserId),
+  toIdx: index('mogic_friend_requests_to_idx').on(t.toUserId),
+}));
+
 export const groupResults = pgTable('mogic_group_results', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   groupId: uuid('group_id').notNull().references(() => groups.id, { onDelete: 'cascade' }),

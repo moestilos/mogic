@@ -2,22 +2,8 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { and, desc, eq, or, sql } from 'drizzle-orm';
 import { db } from '../db/client';
-import { pgTable, uuid, text, timestamp, index } from 'drizzle-orm/pg-core';
-import { users, friends } from '../db/schema';
+import { users, friends, friendRequests } from '../db/schema';
 import { authRequired, getUser } from '../middleware';
-
-/** Inline schema for friend requests — kept in this file to scope migration. */
-export const friendRequests = pgTable('mogic_friend_requests', {
-  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  fromUserId: uuid('from_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  toUserId: uuid('to_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  status: text('status').notNull().default('pending'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  respondedAt: timestamp('responded_at', { withTimezone: true }),
-}, (t) => ({
-  fromIdx: index('mogic_friend_requests_from_idx').on(t.fromUserId),
-  toIdx: index('mogic_friend_requests_to_idx').on(t.toUserId),
-}));
 
 const sendSchema = z.object({ toUserId: z.string().uuid() });
 const idSchema = z.object({ id: z.string().uuid() });

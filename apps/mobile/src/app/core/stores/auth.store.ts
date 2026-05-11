@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import type { ManaColor } from '@crown/game-engine';
 import { CryptoService } from '../services/crypto.service';
+import { ApiService } from '../services/api.service';
 
 export interface Account {
   id: string;
@@ -21,6 +22,7 @@ const SESSION_KEY = 'mogic.session';
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
   private readonly crypto = inject(CryptoService);
+  private readonly api = inject(ApiService);
 
   private readonly _accounts = signal<Account[]>([]);
   private readonly _sessionId = signal<string | null>(null);
@@ -103,6 +105,31 @@ export class AuthStore {
     }
     if (sesRes.value) this._sessionId.set(sesRes.value);
     this._loaded.set(true);
+
+    // If API enabled and we have a token, restore session from server
+    if (this.api.enabled) {
+      await this.api.init();
+      const remote = await this.api.me();
+      if (remote) {
+        // Mirror remote account into local accounts list (no password needed)
+        const exists = this._accounts().find((a) => a.id === remote.id);
+        if (!exists) {
+          this._accounts.set([...this._accounts(), {
+            id: remote.id,
+            email: remote.email,
+            username: remote.username,
+            displayName: remote.displayName,
+            color: remote.color,
+            avatar: remote.avatar,
+            passwordHash: 'remote',
+            salt: 'remote',
+            createdAt: Date.now(),
+          }]);
+          await this.persistAccounts();
+        }
+        await this.setSession(remote.id);
+      }
+    }
   }
 
   private async persistAccounts(): Promise<void> {
@@ -126,6 +153,29 @@ export class AuthStore {
     if (!email.includes('@') || email.length < 5) return { error: 'Email inválido' };
     if (input.password.length < 6) return { error: 'Contraseña mínimo 6 caracteres' };
     if (input.displayName.trim().length < 2) return { error: 'Nombre demasiado corto' };
+
+    // Remote register via API
+    if (this.api.enabled) {
+      try {
+        const { profile } = await this.api.register({
+          email, password: input.password,
+          displayName: input.displayName.trim(),
+          color: input.color, avatar: input.avatar,
+        });
+        const acc: Account = {
+          id: profile.id, email: profile.email, username: profile.username,
+          displayName: profile.displayName, color: profile.color as ManaColor,
+          avatar: profile.avatar, passwordHash: 'remote', salt: 'remote',
+          createdAt: Date.now(),
+        };
+        this._accounts.set([...this._accounts().filter((a) => a.id !== acc.id), acc]);
+        await this.persistAccounts();
+        await this.setSession(acc.id);
+        return { error: null };
+      } catch (e: any) {
+        return { error: this.translateApiError(String(e?.message ?? e)) };
+      }
+    }
 
     if (this._accounts().some((a) => a.email === email)) {
       return { error: 'Email ya registrado. Inicia sesión' };
@@ -161,6 +211,25 @@ export class AuthStore {
 
   async login(email: string, password: string): Promise<{ error: string | null }> {
     const trimmed = email.trim().toLowerCase();
+
+    if (this.api.enabled) {
+      try {
+        const { profile } = await this.api.login(trimmed, password);
+        const acc: Account = {
+          id: profile.id, email: profile.email, username: profile.username,
+          displayName: profile.displayName, color: profile.color as ManaColor,
+          avatar: profile.avatar, passwordHash: 'remote', salt: 'remote',
+          createdAt: Date.now(),
+        };
+        this._accounts.set([...this._accounts().filter((a) => a.id !== acc.id), acc]);
+        await this.persistAccounts();
+        await this.setSession(acc.id);
+        return { error: null };
+      } catch (e: any) {
+        return { error: this.translateApiError(String(e?.message ?? e)) };
+      }
+    }
+
     const acc = this._accounts().find((a) => a.email === trimmed);
     if (!acc) return { error: 'Email o contraseña incorrectos' };
     const hash = await this.crypto.hash(password, acc.salt);
@@ -169,7 +238,17 @@ export class AuthStore {
     return { error: null };
   }
 
+  private translateApiError(msg: string): string {
+    const m = msg.toLowerCase();
+    if (m.includes('invalid credentials')) return 'Email o contraseña incorrectos';
+    if (m.includes('already registered') || m.includes('email already')) return 'Email ya registrado';
+    if (m.includes('invalid input')) return 'Datos no válidos';
+    if (m.includes('jwt')) return 'Sesión expirada, vuelve a entrar';
+    return msg;
+  }
+
   async logout(): Promise<void> {
+    if (this.api.enabled) await this.api.logout();
     await this.setSession(null);
   }
 
