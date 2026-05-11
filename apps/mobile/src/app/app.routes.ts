@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from './core/stores/auth.store';
 import { ThemeStore } from './core/stores/theme.store';
+import { ProfileStore } from './core/stores/profile.store';
 
 const requireTheme = async () => {
   const theme = inject(ThemeStore);
@@ -18,6 +19,7 @@ const requireTheme = async () => {
 const requireAuth = async () => {
   const theme = inject(ThemeStore);
   const auth = inject(AuthStore);
+  const profile = inject(ProfileStore);
   const router = inject(Router);
   await theme.load();
   if (!theme.hasChosen()) {
@@ -25,10 +27,13 @@ const requireAuth = async () => {
     return false;
   }
   await auth.load();
-  if (!auth.isSignedIn()) {
+  const me = auth.me();
+  if (!me) {
     void router.navigate(['/sign-in']);
     return false;
   }
+  // Scope friends store to this account on every nav
+  await profile.setScope(me.id);
   return true;
 };
 

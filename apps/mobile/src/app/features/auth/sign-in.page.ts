@@ -179,9 +179,12 @@ export class SignInPage {
       if (error) { this.errorMsg.set(error); void this.haptics.error(); return; }
     }
 
-    // Mirror to ProfileStore for backwards compat (game/friends still read profile)
+    // Mirror to ProfileStore + scope friends list to this account
     const me = this.auth.me();
-    if (me) await this.localProfile.signIn(me.displayName, me.color, me.avatar);
+    if (me) {
+      await this.localProfile.signIn(me.displayName, me.color, me.avatar);
+      await this.localProfile.setScope(me.id);
+    }
 
     void this.haptics.success();
     void this.router.navigate(['/']);

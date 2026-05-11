@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import auth from './routes/auth';
 import friends from './routes/friends';
+import friendRequests from './routes/friend-requests';
 import groups from './routes/groups';
 
 const app = new Hono().basePath('/api');
@@ -18,6 +19,7 @@ app.get('/health', (c) => c.json({ ok: true, ts: Date.now() }));
 
 app.route('/auth', auth);
 app.route('/friends', friends);
+app.route('/friend-requests', friendRequests);
 app.route('/groups', groups);
 
 app.onError((err, c) => {
