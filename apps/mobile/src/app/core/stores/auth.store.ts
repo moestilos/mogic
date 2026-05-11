@@ -44,6 +44,28 @@ export class AuthStore {
   });
   readonly isSignedIn = computed(() => !!this.me());
 
+  /** Other accounts on this device (excluding current session). Public-safe shape (no passwordHash). */
+  readonly otherAccounts = computed(() => {
+    const id = this._sessionId();
+    return this._accounts()
+      .filter((a) => a.id !== id)
+      .map((a) => ({
+        id: a.id,
+        email: a.email,
+        username: a.username,
+        displayName: a.displayName,
+        color: a.color,
+        avatar: a.avatar,
+      }));
+  });
+
+  /** Lookup any account by id (for invites). */
+  accountById(id: string) {
+    const a = this._accounts().find((x) => x.id === id);
+    if (!a) return null;
+    return { id: a.id, username: a.username, displayName: a.displayName, color: a.color, avatar: a.avatar };
+  }
+
   async load(): Promise<void> {
     if (this._loaded()) return;
     const [accRes, sesRes] = await Promise.all([
