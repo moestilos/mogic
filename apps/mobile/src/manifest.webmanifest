@@ -1,0 +1,19 @@
+{
+  "name": "Mogic",
+  "short_name": "Mogic",
+  "description": "MTG Commander companion — life counter, groups, friends",
+  "theme_color": "#0c0c12",
+  "background_color": "#0c0c12",
+  "display": "standalone",
+  "orientation": "any",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "es",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "categories": ["games", "entertainment", "utilities"],
+  "prefer_related_applications": false
+}

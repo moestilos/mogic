@@ -7,6 +7,7 @@ import { GroupsStore } from '../../core/stores/groups.store';
 import { ThemeStore } from '../../core/stores/theme.store';
 import { ProfileStore } from '../../core/stores/profile.store';
 import { AuthStore } from '../../core/stores/auth.store';
+import { InstallPromptService } from '../../shared/install-prompt.service';
 import { ThemePickerComponent } from '../../shared/theme-picker.component';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
@@ -59,6 +60,30 @@ import { IconComponent } from '../../shared/icon.component';
             }
           </div>
         </header>
+
+        <!-- ── Install PWA banner ─────────────────────────── -->
+        @if (install.canInstall() && !install.isStandalone()) {
+          <button class="install-banner relative z-10 w-full mb-4 text-left" (click)="doInstall()">
+            <crown-icon name="Sparkles" [size]="18" cls="crown-text-accent"></crown-icon>
+            <div class="flex-1 min-w-0">
+              <div class="install-title">Instalar Mogic</div>
+              <div class="install-sub">Acceso directo desde tu home</div>
+            </div>
+            <crown-icon name="ChevronLeft" [size]="14" cls="crown-text-mid" style="transform: rotate(180deg);"></crown-icon>
+          </button>
+        }
+        @if (install.isIOS() && !install.isStandalone() && !iosHintDismissed()) {
+          <div class="install-banner ios-hint relative z-10 w-full mb-4">
+            <crown-icon name="Sparkles" [size]="18" cls="crown-text-accent"></crown-icon>
+            <div class="flex-1 min-w-0">
+              <div class="install-title">Añade Mogic a tu pantalla</div>
+              <div class="install-sub">Pulsa Compartir <strong>↑</strong> y luego "Añadir a inicio"</div>
+            </div>
+            <button class="crown-btn-ghost px-2" (click)="dismissIosHint()" aria-label="Cerrar">
+              <crown-icon name="X" [size]="14"></crown-icon>
+            </button>
+          </div>
+        }
 
         <!-- ── Stats row ────────────────────────────────────── -->
         <section class="grid grid-cols-3 gap-2 mb-5 relative z-10">
@@ -357,6 +382,33 @@ import { IconComponent } from '../../shared/icon.component';
     .home-theme-swatch.sigil { background: #C9A256; }
     .home-theme-swatch.stark { background: #14140e; }
     .home-theme-swatch.cards { background: linear-gradient(180deg, #e8c576, #c9a256 60%, #8a6a2a); box-shadow: inset 0 0 0 1px #3a2818; }
+
+    .install-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: rgba(179,157,255,0.06);
+      border: 1px solid var(--accent-flat);
+      border-radius: var(--pod-radius);
+      cursor: pointer;
+      transition: background 160ms ease;
+    }
+    .install-banner:hover { background: rgba(179,157,255,0.1); }
+    .install-banner.ios-hint { cursor: default; }
+    .install-title {
+      font-family: var(--font-name);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-hi);
+    }
+    .install-sub {
+      font-family: var(--font-hud);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-top: 3px;
+    }
+    .install-sub strong { color: var(--accent-flat); font-weight: 700; }
   `],
 })
 export class HomePage implements OnInit {
@@ -364,7 +416,9 @@ export class HomePage implements OnInit {
   readonly theme = inject(ThemeStore);
   readonly profile = inject(ProfileStore);
   readonly auth = inject(AuthStore);
+  readonly install = inject(InstallPromptService);
   readonly groupsStore = inject(GroupsStore);
+  readonly iosHintDismissed = signal(localStorage.getItem('mogic.iosHintDismissed') === '1');
   private readonly router = inject(Router);
 
   readonly pickerOpen = signal(false);
@@ -395,4 +449,9 @@ export class HomePage implements OnInit {
   openGroups() { void this.router.navigate(['/groups']); }
   openProfile() { void this.router.navigate(['/profile']); }
   openAdmin() { void this.router.navigate(['/admin']); }
+  async doInstall() { await this.install.install(); }
+  dismissIosHint() {
+    localStorage.setItem('mogic.iosHintDismissed', '1');
+    this.iosHintDismissed.set(true);
+  }
 }
