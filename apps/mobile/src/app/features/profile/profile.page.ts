@@ -679,10 +679,10 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
       color: var(--text-lo); margin-top: 5px;
     }
 
-    /* Edit profile modal — self-contained dark styles */
+    /* Edit profile modal — adopta theme tokens */
     .edit-backdrop {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.78);
+      background: var(--modal-backdrop);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 0;
@@ -692,149 +692,212 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
       width: 100%; max-width: 32rem; max-height: 92vh;
       overflow-y: auto;
       padding: 22px;
-      background: #0c0c12;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 22px 22px 0 0;
-      color: #e8e8f0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--divider);
+      border-radius: var(--modal-radius) var(--modal-radius) 0 0;
+      color: var(--text-hi);
       margin: 0 auto;
     }
     @media (min-width: 768px) {
-      .edit-modal { border-radius: 22px; margin-bottom: 2rem; }
+      .edit-modal { border-radius: var(--modal-radius); margin-bottom: 2rem; }
     }
+    [data-theme='vapor'] .edit-modal { backdrop-filter: blur(24px); }
+    [data-theme='brutal'] .edit-modal { border-width: 1.5px; }
+    [data-theme='sigil'] .edit-modal { border-color: rgba(201,162,86,0.25); }
+
     .edit-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px;
     }
     .edit-eyebrow {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-hud);
       font-size: 10px;
-      letter-spacing: 0.28em;
+      letter-spacing: var(--hud-letter);
       text-transform: uppercase;
-      color: #7a7a90;
+      color: var(--hud-color);
     }
+    [data-theme='sigil'] .edit-eyebrow { text-transform: lowercase; font-style: italic; }
     .edit-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      font-size: 22px;
+      font-family: var(--font-display);
+      font-weight: var(--life-weight);
+      font-size: 24px;
       letter-spacing: -0.02em;
-      color: #f5f5fa;
+      color: var(--text-hi);
       margin-top: 4px;
     }
     .edit-icon-btn {
       width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: #c4c4d0;
+      background: var(--bg-input);
+      border: 1px solid var(--divider);
+      border-radius: var(--btn-radius);
+      color: var(--text-mid);
       cursor: pointer;
+      transition: background 160ms ease;
     }
     .edit-icon-btn:hover { background: rgba(255,255,255,0.1); }
+    [data-theme='stark'] .edit-icon-btn:hover { background: rgba(20,20,14,0.08); }
+
     .edit-tabs {
       display: flex; gap: 4px; padding: 4px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--divider);
+      border-radius: var(--btn-radius);
       margin-bottom: 16px;
     }
+    [data-theme='brutal'] .edit-tabs { padding: 0; gap: 0; border-radius: 0; }
     .edit-tab {
-      flex: 1; padding: 9px 6px;
+      flex: 1; padding: 10px 6px;
       background: transparent;
       border: none;
-      color: #9999a8;
-      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text-lo);
+      font-family: var(--font-btn);
       font-size: 11px;
       font-weight: 500;
-      border-radius: 7px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-radius: calc(var(--btn-radius) - 2px);
       cursor: pointer;
       transition: background 160ms ease, color 160ms ease;
     }
-    .edit-tab:hover { color: #c4c4d0; }
-    .edit-tab.is-on { background: rgba(255,255,255,0.1); color: #f5f5fa; }
+    [data-theme='brutal'] .edit-tab { border-radius: 0; border-right: 1.5px solid var(--text-hi); }
+    [data-theme='brutal'] .edit-tab:last-child { border-right: none; }
+    [data-theme='sigil'] .edit-tab { font-style: italic; letter-spacing: 0.2em; text-transform: none; }
+    .edit-tab:hover { color: var(--text-mid); }
+    .edit-tab.is-on {
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+    [data-theme='chrome'] .edit-tab.is-on {
+      background-size: 300% 100%;
+      animation: chromeFlow 5s linear infinite;
+    }
+    [data-theme='sigil'] .edit-tab.is-on { background: transparent; color: var(--accent-flat); }
+
     .edit-section { margin-bottom: 14px; }
     .edit-label {
       display: block;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-hud);
       font-size: 10px;
-      letter-spacing: 0.2em;
+      letter-spacing: var(--hud-letter);
       text-transform: uppercase;
-      color: #7a7a90;
+      color: var(--hud-color);
       margin-top: 12px;
       margin-bottom: 6px;
     }
+    [data-theme='sigil'] .edit-label { text-transform: lowercase; font-style: italic; }
     .edit-input {
       width: 100%;
       padding: 11px 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: #f5f5fa;
-      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-input);
+      border: 1px solid var(--divider);
+      border-radius: var(--input-radius);
+      color: var(--text-hi);
+      font-family: var(--font-body);
       font-size: 14px;
       outline: none;
       transition: border-color 160ms ease;
     }
-    .edit-input:focus { border-color: #b39dff; }
-    .edit-input::placeholder { color: #6e6e7e; }
+    .edit-input:focus { border-color: var(--accent-flat); }
+    .edit-input::placeholder { color: var(--text-lo); }
+    [data-theme='brutal'] .edit-input { border-width: 1.5px; }
+    [data-theme='sigil'] .edit-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--bg-pod-border);
+      border-radius: 0;
+      font-style: italic;
+      font-size: 16px;
+    }
+
     .edit-hint {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-hud);
       font-size: 9px;
       letter-spacing: 0.1em;
-      color: #6e6e7e;
+      color: var(--text-lo);
       margin-top: 4px;
       margin-bottom: 4px;
     }
     .edit-avatar-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      color: #c4c4d0;
+      background: var(--bg-input);
+      border: 1px solid var(--divider);
+      border-radius: calc(var(--btn-radius) - 2px);
+      color: var(--text-mid);
       cursor: pointer;
-      transition: background 160ms ease, border-color 160ms ease;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
+    [data-theme='brutal'] .edit-avatar-btn { border-radius: 0; border-width: 1.5px; }
     .edit-avatar-btn:hover { background: rgba(255,255,255,0.08); }
+    [data-theme='stark'] .edit-avatar-btn:hover { background: rgba(20,20,14,0.06); }
     .edit-avatar-btn.is-on {
-      background: rgba(179,157,255,0.15);
-      border-color: #b39dff;
-      color: #fff;
+      background: var(--accent);
+      border-color: transparent;
+      color: var(--accent-text);
     }
+    [data-theme='chrome'] .edit-avatar-btn.is-on {
+      background-size: 300% 100%;
+      animation: chromeFlow 5s linear infinite;
+    }
+    [data-theme='sigil'] .edit-avatar-btn.is-on {
+      background: transparent;
+      border-color: var(--accent-flat);
+      color: var(--accent-flat);
+    }
+
     .edit-cta {
       width: 100%;
       padding: 14px;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      background: linear-gradient(115deg, #ff9ed0, #b39dff, #9dd2ff, #9dffb3, #ffe89d);
-      background-size: 300% 100%;
-      color: #08080a;
+      background: var(--accent);
+      color: var(--accent-text);
       border: none;
-      border-radius: 12px;
-      font-family: 'Space Grotesk', sans-serif;
+      border-radius: var(--btn-radius);
+      font-family: var(--font-btn);
       font-weight: 700;
       font-size: 12px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       cursor: pointer;
+      transition: transform 100ms ease;
+    }
+    [data-theme='chrome'] .edit-cta {
+      background-size: 300% 100%;
       animation: chromeFlow 5s linear infinite;
     }
+    [data-theme='sigil'] .edit-cta {
+      background: transparent;
+      color: var(--accent-flat);
+      border: 1px solid var(--accent-flat);
+      font-style: italic;
+      letter-spacing: 0.22em;
+      text-transform: none;
+    }
+    [data-theme='stark'] .edit-cta { font-style: italic; }
     .edit-cta:active { transform: scale(0.98); }
+
     .edit-error {
       display: flex; align-items: center; gap: 6px;
       margin-top: 12px;
       padding: 10px 14px;
-      background: rgba(255,122,122,0.1);
-      border: 1px solid rgba(255,122,122,0.4);
-      border-radius: 10px;
-      color: #ff9e9e;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger);
+      border-radius: var(--input-radius);
+      color: var(--danger);
       font-size: 13px;
+      font-family: var(--font-body);
     }
     .edit-success {
       display: flex; align-items: center; gap: 6px;
       margin-top: 12px;
       padding: 10px 14px;
       background: rgba(157,255,179,0.1);
-      border: 1px solid rgba(157,255,179,0.4);
-      border-radius: 10px;
-      color: #9dffb3;
+      border: 1px solid var(--success);
+      border-radius: var(--input-radius);
+      color: var(--success);
       font-size: 13px;
+      font-family: var(--font-body);
     }
+    [data-theme='stark'] .edit-success { background: rgba(74,122,58,0.08); }
   `],
 })
 export class ProfilePage implements OnInit {
