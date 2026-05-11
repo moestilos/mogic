@@ -1,4 +1,4 @@
-import { Component, computed, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
@@ -161,12 +161,11 @@ const GLOW: Record<ManaColor, string> = {
         @if (store.isOver()) {
           <div class="mythic-moment">
             <div class="crown-backdrop"></div>
-            <div class="crown-modal mythic-moment-card">
-              <div class="mythic-crown"><crown-icon name="Crown" [size]="64" [strokeWidth]="1.25" cls="crown-text-accent"></crown-icon></div>
+            <div class="mythic-moment-card">
+              <div class="mythic-crown"><crown-icon name="Crown" [size]="64" [strokeWidth]="1.25"></crown-icon></div>
               <div class="mythic-eyebrow">Ganador de la mesa</div>
               <div class="mythic-name">{{ store.winner()?.name }}</div>
-              <button class="crown-btn-primary w-full py-4 text-xs uppercase tracking-widest"
-                      (click)="finish()">Guardar y salir</button>
+              <button class="mythic-cta" (click)="finish()">Guardar y salir</button>
             </div>
           </div>
         }
@@ -213,6 +212,18 @@ export class GamePage implements OnInit, OnDestroy {
   private pointerStart = 0;
   private currentPointerId: number | null = null;
   private lastBumpAt = 0;
+
+  constructor() {
+    // Cuando el juego termina, cerrar todos los modals para que solo se vea Mythic Moment
+    effect(() => {
+      if (this.store.isOver()) {
+        this.drawerPid.set(null);
+        this.cmdMatrixPid.set(null);
+        this.themePickerOpen.set(false);
+        this.diceResult.set(null);
+      }
+    });
+  }
 
   readonly drawerPlayer = computed(() => {
     const id = this.drawerPid();
@@ -350,6 +361,7 @@ export class GamePage implements OnInit, OnDestroy {
 
   openDrawer(p: Player, ev: Event) {
     ev.stopPropagation();
+    if (this.store.isOver()) return;
     void this.haptics.medium();
     this.drawerPid.set(p.id);
   }
