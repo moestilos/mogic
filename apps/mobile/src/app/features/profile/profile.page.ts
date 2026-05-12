@@ -93,24 +93,26 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
             </div>
           </div>
 
-          <!-- Tabs -->
-          <div class="profile-tabs relative z-10 mb-5">
-            <button class="profile-tab" [class.is-on]="tab() === 'friends'" (click)="tab.set('friends')">
-              <crown-icon name="Users" [size]="14"></crown-icon> Amigos
-              <span class="profile-tab-count">{{ store.friends().length }}</span>
-            </button>
-            <button class="profile-tab" [class.is-on]="tab() === 'requests'" (click)="tab.set('requests')">
-              <crown-icon name="UserPlus" [size]="14"></crown-icon> Solicitudes
-              @if (requests.incomingPending().length > 0) {
-                <span class="profile-tab-badge">{{ requests.incomingPending().length }}</span>
-              }
-            </button>
-            <button class="profile-tab" [class.is-on]="tab() === 'search'" (click)="tab.set('search')">
-              <crown-icon name="Search" [size]="14"></crown-icon> Buscar
-            </button>
-            <button class="profile-tab" [class.is-on]="tab() === 'stats'" (click)="tab.set('stats')">
-              <crown-icon name="Trophy" [size]="14"></crown-icon> Stats
-            </button>
+          <!-- Tabs (sticky) -->
+          <div class="profile-tabs-wrap relative z-20 mb-5">
+            <div class="profile-tabs">
+              <button class="profile-tab" [class.is-on]="tab() === 'friends'" (click)="tab.set('friends')">
+                <crown-icon name="Users" [size]="14"></crown-icon> Amigos
+                <span class="profile-tab-count">{{ store.friends().length }}</span>
+              </button>
+              <button class="profile-tab" [class.is-on]="tab() === 'requests'" (click)="tab.set('requests')">
+                <crown-icon name="UserPlus" [size]="14"></crown-icon> Solicitudes
+                @if (requests.incomingPending().length > 0) {
+                  <span class="profile-tab-badge">{{ requests.incomingPending().length }}</span>
+                }
+              </button>
+              <button class="profile-tab" [class.is-on]="tab() === 'search'" (click)="tab.set('search')">
+                <crown-icon name="Search" [size]="14"></crown-icon> Buscar
+              </button>
+              <button class="profile-tab" [class.is-on]="tab() === 'stats'" (click)="tab.set('stats')">
+                <crown-icon name="Trophy" [size]="14"></crown-icon> Stats
+              </button>
+            </div>
           </div>
 
           <!-- FRIENDS TAB -->
@@ -127,6 +129,22 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                   </button>
                 </div>
               } @else {
+                <div class="profile-toolbar mb-3">
+                  <div class="profile-sort">
+                    <button class="profile-sort-chip" [class.is-on]="friendSort() === 'wins'"   (click)="friendSort.set('wins')">
+                      <crown-icon name="Trophy" [size]="11"></crown-icon> Wins
+                    </button>
+                    <button class="profile-sort-chip" [class.is-on]="friendSort() === 'games'"  (click)="friendSort.set('games')">
+                      <crown-icon name="Dices" [size]="11"></crown-icon> Partidas
+                    </button>
+                    <button class="profile-sort-chip" [class.is-on]="friendSort() === 'name'"   (click)="friendSort.set('name')">
+                      <crown-icon name="Sparkles" [size]="11"></crown-icon> A-Z
+                    </button>
+                  </div>
+                  <button class="profile-sort-add" (click)="tab.set('search')" aria-label="Añadir amigo">
+                    <crown-icon name="UserPlus" [size]="14"></crown-icon>
+                  </button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                   @for (f of sortedFriends(); track f.id; let i = $index) {
                     <div class="relative">
@@ -306,12 +324,13 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
 
           <!-- STATS TAB -->
           @if (tab() === 'stats') {
-            <div class="relative z-10 space-y-4">
+            <div class="relative z-10 space-y-5">
+              <!-- Headline metrics -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="profile-stat-card">
-                  <div class="profile-stat-icon"><crown-icon name="Users" [size]="16" cls="crown-text-mid"></crown-icon></div>
-                  <div class="profile-stat-num">{{ store.friends().length }}</div>
-                  <div class="profile-stat-label">Amigos</div>
+                  <div class="profile-stat-icon"><crown-icon name="Trophy" [size]="16" cls="crown-text-accent"></crown-icon></div>
+                  <div class="profile-stat-num crown-text-accent">{{ winratePct() }}<span class="profile-stat-suffix">%</span></div>
+                  <div class="profile-stat-label">Winrate</div>
                 </div>
                 <div class="profile-stat-card">
                   <div class="profile-stat-icon"><crown-icon name="Dices" [size]="16" cls="crown-text-mid"></crown-icon></div>
@@ -319,17 +338,18 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                   <div class="profile-stat-label">Partidas</div>
                 </div>
                 <div class="profile-stat-card">
-                  <div class="profile-stat-icon"><crown-icon name="Trophy" [size]="16" cls="crown-text-accent"></crown-icon></div>
-                  <div class="profile-stat-num crown-text-accent">{{ totalWins() }}</div>
-                  <div class="profile-stat-label">Wins amigos</div>
+                  <div class="profile-stat-icon"><crown-icon name="Users" [size]="16" cls="crown-text-mid"></crown-icon></div>
+                  <div class="profile-stat-num">{{ store.friends().length }}</div>
+                  <div class="profile-stat-label">Amigos</div>
                 </div>
                 <div class="profile-stat-card">
                   <div class="profile-stat-icon"><crown-icon name="Flame" [size]="16" cls="crown-text-danger"></crown-icon></div>
                   <div class="profile-stat-num">{{ bestStreak() }}</div>
-                  <div class="profile-stat-label">Best streak</div>
+                  <div class="profile-stat-label">Best</div>
                 </div>
               </div>
 
+              <!-- King of the table -->
               @if (topFriend(); as top) {
                 <div>
                   <div class="crown-hud mb-2.5 flex items-center gap-1.5">
@@ -345,6 +365,52 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                       games: top.games,
                       rank: 1
                     }"></player-card>
+                </div>
+              }
+
+              <!-- Color distribution -->
+              @if (store.friends().length > 0) {
+                <div>
+                  <div class="crown-hud mb-2.5 flex items-center gap-1.5">
+                    <crown-icon name="Sparkles" [size]="11"></crown-icon> Distribución por color
+                  </div>
+                  <div class="profile-color-dist">
+                    @for (c of colorDistribution(); track c.color) {
+                      <div class="profile-color-row">
+                        <div class="crown-pip" [ngClass]="c.color | lowercase"></div>
+                        <div class="profile-color-key">{{ c.color }}</div>
+                        <div class="profile-color-bar-track">
+                          <div class="profile-color-bar-fill" [ngClass]="c.color | lowercase" [style.width.%]="c.pct"></div>
+                        </div>
+                        <div class="profile-color-num">{{ c.count }}</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Identity summary -->
+              @if (auth.me(); as me) {
+                <div>
+                  <div class="crown-hud mb-2.5 flex items-center gap-1.5">
+                    <crown-icon name="Settings" [size]="11"></crown-icon> Cuenta
+                  </div>
+                  <div class="profile-meta-card">
+                    <div class="profile-meta-row">
+                      <span class="profile-meta-key">Email</span>
+                      <span class="profile-meta-val truncate">{{ me.email }}</span>
+                    </div>
+                    <div class="profile-meta-row">
+                      <span class="profile-meta-key">Usuario</span>
+                      <span class="profile-meta-val">&#64;{{ me.username }}</span>
+                    </div>
+                    <div class="profile-meta-row">
+                      <span class="profile-meta-key">Color</span>
+                      <span class="profile-meta-val flex items-center gap-1.5">
+                        <span class="crown-pip" [ngClass]="me.color | lowercase"></span> {{ me.color }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               }
             </div>
@@ -376,6 +442,17 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
             </div>
 
             @if (editTab() === 'identity') {
+              <!-- Live preview -->
+              <div class="edit-preview">
+                <div class="edit-preview-halo" [ngClass]="(editColor() | lowercase)">
+                  <div class="edit-preview-avatar">
+                    <crown-icon [name]="$any(editAvatar())" [size]="36" [strokeWidth]="1.2"></crown-icon>
+                  </div>
+                </div>
+                <div class="edit-preview-name">{{ editName() || 'Tu nombre' }}</div>
+                <div class="edit-preview-color">{{ editColor() }}</div>
+              </div>
+
               <div class="edit-section">
                 <label class="edit-label">Nombre visible</label>
                 <input class="edit-input" [value]="editName()" (input)="editName.set($any($event.target).value)" maxlength="20" />
@@ -1061,6 +1138,222 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
       font-family: var(--font-body);
     }
     [data-theme='stark'] .edit-success { background: rgba(74,122,58,0.08); }
+
+    /* ─── Sticky tabs ─────────────────────────────────── */
+    .profile-tabs-wrap {
+      position: sticky;
+      top: max(env(safe-area-inset-top, 0px), 0px);
+      padding-top: 4px;
+      padding-bottom: 4px;
+      background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-base) 80%, transparent 100%);
+    }
+    [data-theme='stark'] .profile-tabs-wrap { background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-base) 80%, transparent 100%); }
+
+    /* ─── Friends sort toolbar ────────────────────────── */
+    .profile-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .profile-sort {
+      display: flex; gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .profile-sort::-webkit-scrollbar { display: none; }
+    .profile-sort-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--divider);
+      border-radius: 99px;
+      color: var(--text-lo);
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+    [data-theme='stark']  .profile-sort-chip { background: rgba(20,20,14,0.03); }
+    [data-theme='brutal'] .profile-sort-chip { border-radius: 0; border-width: 1.5px; }
+    .profile-sort-chip:hover { color: var(--text-mid); }
+    .profile-sort-chip.is-on {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: transparent;
+    }
+    [data-theme='chrome'] .profile-sort-chip.is-on { background-size: 300% 100%; animation: chromeFlow 5s linear infinite; }
+    [data-theme='sigil']  .profile-sort-chip.is-on { background: transparent; color: var(--accent-flat); border-color: var(--accent-flat); }
+
+    .profile-sort-add {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent);
+      color: var(--accent-text);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 120ms ease;
+      flex-shrink: 0;
+    }
+    .profile-sort-add:active { transform: scale(0.92); }
+    [data-theme='brutal'] .profile-sort-add { border-radius: 0; }
+    [data-theme='chrome'] .profile-sort-add { background-size: 300% 100%; animation: chromeFlow 5s linear infinite; }
+    [data-theme='sigil']  .profile-sort-add { background: transparent; color: var(--accent-flat); border: 1px solid var(--accent-flat); }
+
+    /* ─── Stats: suffix, color distribution, meta ─────── */
+    .profile-stat-suffix {
+      font-size: 14px;
+      color: var(--text-lo);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+    .profile-color-dist {
+      display: flex; flex-direction: column; gap: 8px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--divider);
+      border-radius: var(--pod-radius);
+    }
+    [data-theme='stark']  .profile-color-dist { background: rgba(20,20,14,0.03); }
+    [data-theme='brutal'] .profile-color-dist { border-radius: 0; border-width: 1.5px; }
+    .profile-color-row {
+      display: grid;
+      grid-template-columns: 12px 18px 1fr 24px;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-color-key {
+      font-family: var(--font-hud);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--text-mid);
+    }
+    .profile-color-bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    [data-theme='stark']  .profile-color-bar-track { background: rgba(20,20,14,0.06); }
+    [data-theme='brutal'] .profile-color-bar-track { border-radius: 0; height: 8px; border: 1px solid var(--text-hi); background: transparent; }
+    .profile-color-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 380ms ease;
+    }
+    [data-theme='brutal'] .profile-color-bar-fill { border-radius: 0; }
+    .profile-color-bar-fill.w { background: linear-gradient(90deg, #FFFDE0, #F8E9B4); }
+    .profile-color-bar-fill.u { background: linear-gradient(90deg, #B7DDF8, #4F8FCB); }
+    .profile-color-bar-fill.b { background: linear-gradient(90deg, #6e5b78, #1a1620); }
+    .profile-color-bar-fill.r { background: linear-gradient(90deg, #F8B7B0, #D24F45); }
+    .profile-color-bar-fill.g { background: linear-gradient(90deg, #BFE6A6, #5A9A4C); }
+    .profile-color-bar-fill.c { background: linear-gradient(90deg, #d8d8e0, #8b8b9e); }
+    .profile-color-num {
+      font-family: var(--font-life);
+      font-weight: var(--life-weight);
+      font-size: 14px;
+      color: var(--text-hi);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .profile-meta-card {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--divider);
+      border-radius: var(--pod-radius);
+    }
+    [data-theme='stark']  .profile-meta-card { background: rgba(20,20,14,0.03); }
+    [data-theme='brutal'] .profile-meta-card { border-radius: 0; border-width: 1.5px; }
+    .profile-meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .profile-meta-row:last-child { border-bottom: none; }
+    .profile-meta-key {
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      flex-shrink: 0;
+    }
+    .profile-meta-val {
+      font-family: var(--font-name);
+      font-size: 13px;
+      color: var(--text-hi);
+      min-width: 0;
+      text-align: right;
+    }
+
+    /* ─── Edit modal: live preview ────────────────────── */
+    .edit-preview {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 12px 18px;
+      margin-bottom: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--divider);
+      border-radius: var(--pod-radius);
+    }
+    [data-theme='stark']  .edit-preview { background: rgba(20,20,14,0.03); }
+    [data-theme='brutal'] .edit-preview { border-radius: 0; border-width: 1.5px; }
+
+    .edit-preview-halo {
+      position: relative;
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    .edit-preview-halo::before {
+      content: ''; position: absolute; inset: -3px;
+      border-radius: 50%;
+      padding: 2px;
+      background: conic-gradient(from 180deg, var(--halo-from), var(--halo-to), var(--halo-from));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0.85;
+    }
+    .edit-preview-halo.w { --halo-from: #FFFDE0; --halo-to: #F8E9B4; }
+    .edit-preview-halo.u { --halo-from: #B7DDF8; --halo-to: #4F8FCB; }
+    .edit-preview-halo.b { --halo-from: #6e5b78; --halo-to: #1a1620; }
+    .edit-preview-halo.r { --halo-from: #F8B7B0; --halo-to: #D24F45; }
+    .edit-preview-halo.g { --halo-from: #BFE6A6; --halo-to: #5A9A4C; }
+    .edit-preview-halo.c { --halo-from: #d8d8e0; --halo-to: #8b8b9e; }
+    [data-theme='brutal'] .edit-preview-halo { border-radius: 0; }
+    [data-theme='brutal'] .edit-preview-halo::before { border-radius: 0; background: var(--text-hi); opacity: 1; }
+
+    .edit-preview-avatar {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-elevated, rgba(255,255,255,0.04));
+      color: var(--text-hi);
+    }
+    [data-theme='brutal'] .edit-preview-avatar { border-radius: 0; }
+    [data-theme='sigil']  .edit-preview-avatar { color: var(--accent-flat); background: rgba(201,162,86,0.06); }
+
+    .edit-preview-name {
+      font-family: var(--font-display);
+      font-weight: var(--life-weight);
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: var(--text-hi);
+      margin-top: 2px;
+    }
+    [data-theme='brutal'] .edit-preview-name { text-transform: uppercase; }
+    [data-theme='sigil']  .edit-preview-name { font-style: italic; }
+    .edit-preview-color {
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-top: 2px;
+    }
   `],
 })
 export class ProfilePage implements OnInit {
@@ -1071,6 +1364,7 @@ export class ProfilePage implements OnInit {
   private readonly haptics = inject(HapticsService);
 
   readonly tab = signal<'friends' | 'requests' | 'search' | 'stats'>('friends');
+  readonly friendSort = signal<'wins' | 'games' | 'name'>('wins');
   readonly perforations = Array.from({ length: 28 });
   readonly searchQuery = signal('');
   readonly errorMsg = signal<string | null>(null);
@@ -1101,12 +1395,30 @@ export class ProfilePage implements OnInit {
   readonly bestStreak = computed(() =>
     this.store.friends().reduce((max, f) => Math.max(max, f.wins), 0)
   );
-  readonly sortedFriends = computed(() =>
-    [...this.store.friends()].sort((a, b) => {
-      if (b.wins !== a.wins) return b.wins - a.wins;
-      return b.games - a.games;
-    })
-  );
+  readonly sortedFriends = computed(() => {
+    const sort = this.friendSort();
+    const arr = [...this.store.friends()];
+    if (sort === 'name') return arr.sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === 'games') return arr.sort((a, b) => (b.games - a.games) || (b.wins - a.wins));
+    return arr.sort((a, b) => (b.wins - a.wins) || (b.games - a.games));
+  });
+  readonly winratePct = computed(() => {
+    const wins = this.totalWins();
+    const games = this.store.friends().reduce((sum, f) => sum + f.games, 0);
+    if (games === 0) return 0;
+    return Math.round((wins / games) * 100);
+  });
+  readonly colorDistribution = computed(() => {
+    const friends = this.store.friends();
+    if (friends.length === 0) return [];
+    const counts = new Map<ManaColor, number>();
+    for (const f of friends) counts.set(f.color, (counts.get(f.color) ?? 0) + 1);
+    const total = friends.length;
+    return COLORS
+      .map((c) => ({ color: c, count: counts.get(c) ?? 0, pct: Math.round(((counts.get(c) ?? 0) / total) * 100) }))
+      .filter((r) => r.count > 0)
+      .sort((a, b) => b.count - a.count);
+  });
   readonly searchResults = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     if (q.length < 1) return [];
