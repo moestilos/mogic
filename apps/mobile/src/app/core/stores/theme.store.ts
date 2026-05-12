@@ -23,7 +23,7 @@ export const THEMES: ThemeMeta[] = [
 const STORAGE_KEY = 'crown.theme';
 const CHOSEN_KEY = 'crown.themeChosen';
 const BRUTAL_ACCENT_KEY = 'crown.brutalAccent';
-const DEFAULT_THEME: ThemeId = 'chrome';
+const DEFAULT_THEME: ThemeId = 'brutal';
 
 export type BrutalAccent = 'white' | 'green' | 'blue' | 'red' | 'purple' | 'yellow' | 'orange' | 'cyan' | 'pink';
 

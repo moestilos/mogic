@@ -35,46 +35,60 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
         </header>
 
         @if (auth.me(); as me) {
-          <!-- Hero card -->
-          <div class="profile-hero relative z-10 mb-4">
-            <div class="profile-hero-stripe" [ngClass]="me.color | lowercase"></div>
-            <div class="flex items-center gap-3 p-4">
-              <div class="profile-avatar">
-                <crown-icon [name]="$any(me.avatar)" [size]="32" [strokeWidth]="1.2"></crown-icon>
+          <!-- ID Card -->
+          <div class="id-card relative z-10 mb-5" [attr.data-color]="(me.color | lowercase)">
+            <div class="id-card-stripe" [ngClass]="me.color | lowercase"></div>
+
+            <div class="id-card-top">
+              <div class="id-card-eyebrow">
+                <crown-icon name="Sparkles" [size]="10"></crown-icon> Mogic · ID
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="crown-display profile-hero-name truncate">{{ me.displayName }}</div>
-                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-                  <div class="profile-handle truncate">&#64;{{ me.username }}</div>
-                  <div class="profile-color-chip">
-                    <div class="crown-pip" [ngClass]="me.color | lowercase"></div>
-                    {{ me.color }}
-                  </div>
-                </div>
-              </div>
-              <button class="profile-icon-btn shrink-0" (click)="openEdit()" aria-label="Editar perfil">
-                <crown-icon name="Settings" [size]="16"></crown-icon>
+              <button class="id-card-edit" (click)="openEdit()" aria-label="Editar perfil">
+                <crown-icon name="Settings" [size]="14"></crown-icon>
               </button>
             </div>
 
-            <div class="profile-hero-stats">
-              <div class="profile-hero-stat">
-                <div class="profile-hero-stat-num crown-text-accent">{{ totalWins() }}</div>
-                <div class="profile-hero-stat-label">Wins</div>
-              </div>
-              <div class="profile-hero-stat">
-                <div class="profile-hero-stat-num">{{ totalGames() }}</div>
-                <div class="profile-hero-stat-label">Partidas</div>
-              </div>
-              <div class="profile-hero-stat">
-                <div class="profile-hero-stat-num">{{ store.friends().length }}</div>
-                <div class="profile-hero-stat-label">Amigos</div>
-              </div>
-              <div class="profile-hero-stat">
-                <div class="profile-hero-stat-num crown-text-danger flex items-center gap-1 justify-center">
-                  <crown-icon name="Flame" [size]="18"></crown-icon>{{ bestStreak() }}
+            <div class="id-card-body">
+              <div class="id-avatar-halo" [ngClass]="me.color | lowercase">
+                <div class="id-avatar">
+                  <crown-icon [name]="$any(me.avatar)" [size]="42" [strokeWidth]="1.15"></crown-icon>
                 </div>
-                <div class="profile-hero-stat-label">Best</div>
+              </div>
+
+              <div class="id-card-name">{{ me.displayName }}</div>
+
+              <div class="id-card-meta">
+                <span class="id-handle">&#64;{{ me.username }}</span>
+                <span class="id-dot"></span>
+                <span class="id-color-chip">
+                  <span class="crown-pip" [ngClass]="me.color | lowercase"></span>
+                  {{ me.color }}
+                </span>
+              </div>
+            </div>
+
+            <div class="id-card-perforation" aria-hidden="true">
+              @for (_ of perforations; track $index) { <span></span> }
+            </div>
+
+            <div class="id-card-stats">
+              <div class="id-stat">
+                <div class="id-stat-num crown-text-accent">{{ totalWins() }}</div>
+                <div class="id-stat-label">Wins</div>
+              </div>
+              <div class="id-stat">
+                <div class="id-stat-num">{{ totalGames() }}</div>
+                <div class="id-stat-label">Partidas</div>
+              </div>
+              <div class="id-stat">
+                <div class="id-stat-num">{{ store.friends().length }}</div>
+                <div class="id-stat-label">Amigos</div>
+              </div>
+              <div class="id-stat">
+                <div class="id-stat-num crown-text-danger flex items-center gap-1 justify-center">
+                  <crown-icon name="Flame" [size]="16"></crown-icon>{{ bestStreak() }}
+                </div>
+                <div class="id-stat-label">Best</div>
               </div>
             </div>
           </div>
@@ -459,89 +473,208 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
     [data-theme='brutal'] .profile-icon-btn { border-radius: 0; border-width: 1.5px; }
     [data-theme='stark']  .profile-icon-btn { background: rgba(20,20,14,0.04); }
 
-    .profile-hero {
+    /* ─── ID Card ──────────────────────────────────────── */
+    .id-card {
+      position: relative;
+      max-width: 26rem;
+      margin: 0 auto;
       background: var(--bg-pod);
       border: 1px solid var(--bg-pod-border);
-      border-radius: var(--pod-radius);
+      border-radius: 22px;
       overflow: hidden;
-      position: relative;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.04) inset,
+        0 18px 50px -25px rgba(0,0,0,0.65);
     }
-    [data-theme='stark']  .profile-hero { background: rgba(20,20,14,0.03); border-color: var(--divider); }
-    .profile-hero-stripe {
-      position: absolute;
-      top: 0; bottom: 0; left: 0;
-      width: 4px;
+    [data-theme='stark'] .id-card { background: rgba(20,20,14,0.04); border-color: var(--divider); box-shadow: 0 18px 50px -30px rgba(20,20,14,0.25); }
+    [data-theme='brutal'] .id-card { border-radius: 0; border-width: 2px; box-shadow: 6px 6px 0 0 var(--text-hi); }
+    [data-theme='sigil']  .id-card { border-color: rgba(201,162,86,0.3); }
+    [data-theme='chrome'] .id-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,158,208,0.05), rgba(179,157,255,0.04), rgba(157,210,255,0.03));
+      pointer-events: none;
     }
-    .profile-hero-stripe.w { background: linear-gradient(180deg, #FFFDE0, #F8E9B4); }
-    .profile-hero-stripe.u { background: linear-gradient(180deg, #B7DDF8, #4F8FCB); }
-    .profile-hero-stripe.b { background: linear-gradient(180deg, #4d4253, #1a1620); }
-    .profile-hero-stripe.r { background: linear-gradient(180deg, #F8B7B0, #D24F45); }
-    .profile-hero-stripe.g { background: linear-gradient(180deg, #BFE6A6, #5A9A4C); }
-    .profile-hero-stripe.c { background: linear-gradient(180deg, #d8d8e0, #8b8b9e); }
 
-    .profile-avatar {
-      width: 56px; height: 56px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--divider);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-hi);
-      flex-shrink: 0;
+    .id-card-stripe {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 5px;
     }
-    @media (min-width: 480px) {
-      .profile-avatar { width: 64px; height: 64px; border-radius: 16px; }
-    }
-    [data-theme='brutal'] .profile-avatar { border-radius: 0; border-width: 1.5px; }
-    [data-theme='chrome'] .profile-avatar { background: linear-gradient(135deg, rgba(255,158,208,0.1), rgba(179,157,255,0.1), rgba(157,210,255,0.08)); border-color: rgba(179,157,255,0.3); }
-    [data-theme='sigil']  .profile-avatar { background: rgba(201,162,86,0.08); border-color: rgba(201,162,86,0.4); color: var(--accent-flat); }
+    [data-theme='brutal'] .id-card-stripe { height: 8px; }
+    .id-card-stripe.w { background: linear-gradient(90deg, #FFFDE0, #F8E9B4); }
+    .id-card-stripe.u { background: linear-gradient(90deg, #B7DDF8, #4F8FCB); }
+    .id-card-stripe.b { background: linear-gradient(90deg, #4d4253, #1a1620); }
+    .id-card-stripe.r { background: linear-gradient(90deg, #F8B7B0, #D24F45); }
+    .id-card-stripe.g { background: linear-gradient(90deg, #BFE6A6, #5A9A4C); }
+    .id-card-stripe.c { background: linear-gradient(90deg, #d8d8e0, #8b8b9e); }
 
-    .profile-hero-name {
-      font-size: clamp(22px, 5.5vw, 34px);
-      letter-spacing: -0.025em;
-      line-height: 1.1;
+    .id-card-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 18px 0;
     }
-    .profile-handle {
-      font-family: var(--font-hud);
-      font-size: 10px;
-      letter-spacing: 0.04em;
-      color: var(--text-lo);
-      padding: 2px 7px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 99px;
-      max-width: 100%;
-    }
-    .profile-color-chip {
-      display: inline-flex; align-items: center; gap: 4px;
+    .id-card-eyebrow {
+      display: inline-flex; align-items: center; gap: 5px;
       font-family: var(--font-hud);
       font-size: 9px;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
+      color: var(--hud-color);
+    }
+    [data-theme='sigil'] .id-card-eyebrow { text-transform: lowercase; font-style: italic; letter-spacing: 0.18em; }
+    .id-card-edit {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--divider);
+      border-radius: 9px;
       color: var(--text-mid);
-      padding: 2px 7px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 99px;
-      flex-shrink: 0;
+      cursor: pointer;
+      transition: background 160ms ease, transform 120ms ease;
+    }
+    .id-card-edit:hover { background: rgba(255,255,255,0.1); }
+    .id-card-edit:active { transform: scale(0.92); }
+    [data-theme='brutal'] .id-card-edit { border-radius: 0; border-width: 1.5px; }
+    [data-theme='stark']  .id-card-edit { background: rgba(20,20,14,0.04); }
+
+    .id-card-body {
+      padding: 18px 22px 22px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+      position: relative;
     }
 
-    .profile-hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--divider); }
-    .profile-hero-stat { padding: 10px 4px; text-align: center; border-right: 1px solid var(--divider); }
-    .profile-hero-stat:last-child { border-right: none; }
-    .profile-hero-stat-num {
+    .id-avatar-halo {
+      position: relative;
+      width: 116px; height: 116px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 70%);
+    }
+    .id-avatar-halo::before {
+      content: ''; position: absolute; inset: -3px;
+      border-radius: 50%;
+      padding: 2px;
+      background: conic-gradient(from 180deg, var(--halo-from), var(--halo-to), var(--halo-from));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0.85;
+    }
+    .id-avatar-halo.w { --halo-from: #FFFDE0; --halo-to: #F8E9B4; }
+    .id-avatar-halo.u { --halo-from: #B7DDF8; --halo-to: #4F8FCB; }
+    .id-avatar-halo.b { --halo-from: #6e5b78; --halo-to: #1a1620; }
+    .id-avatar-halo.r { --halo-from: #F8B7B0; --halo-to: #D24F45; }
+    .id-avatar-halo.g { --halo-from: #BFE6A6; --halo-to: #5A9A4C; }
+    .id-avatar-halo.c { --halo-from: #d8d8e0; --halo-to: #8b8b9e; }
+    [data-theme='brutal'] .id-avatar-halo {
+      border-radius: 0;
+      width: 108px; height: 108px;
+    }
+    [data-theme='brutal'] .id-avatar-halo::before {
+      border-radius: 0;
+      background: var(--text-hi);
+      opacity: 1;
+    }
+
+    .id-avatar {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-elevated, rgba(255,255,255,0.03));
+      color: var(--text-hi);
+    }
+    [data-theme='brutal'] .id-avatar { border-radius: 0; }
+    [data-theme='sigil']  .id-avatar { color: var(--accent-flat); background: rgba(201,162,86,0.06); }
+
+    .id-card-name {
+      font-family: var(--font-display);
+      font-weight: var(--life-weight);
+      font-size: clamp(26px, 7vw, 36px);
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      color: var(--text-hi);
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    [data-theme='brutal'] .id-card-name { text-transform: uppercase; letter-spacing: -0.01em; }
+    [data-theme='sigil']  .id-card-name { font-style: italic; }
+
+    .id-card-meta {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .id-handle {
+      font-family: var(--font-hud);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--text-lo);
+    }
+    .id-dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--text-lo); opacity: 0.5;
+    }
+    .id-color-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      padding: 3px 9px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--divider);
+      border-radius: 99px;
+    }
+    [data-theme='brutal'] .id-color-chip { border-radius: 0; border-width: 1.5px; }
+
+    /* perforation row */
+    .id-card-perforation {
+      display: flex; justify-content: space-between;
+      padding: 0 14px;
+      position: relative;
+    }
+    .id-card-perforation::before,
+    .id-card-perforation::after {
+      content: ''; position: absolute; top: 50%;
+      width: 14px; height: 14px;
+      background: var(--bg-base);
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+    .id-card-perforation::before { left: -7px; }
+    .id-card-perforation::after  { right: -7px; }
+    .id-card-perforation span {
+      width: 4px; height: 1px;
+      background: var(--divider);
+      align-self: center;
+    }
+    [data-theme='brutal'] .id-card-perforation::before,
+    [data-theme='brutal'] .id-card-perforation::after { border-radius: 0; }
+    [data-theme='brutal'] .id-card-perforation span { background: var(--text-hi); height: 2px; width: 6px; }
+
+    .id-card-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 14px 8px 18px;
+    }
+    .id-stat {
+      text-align: center;
+      padding: 4px 2px;
+      border-right: 1px solid var(--divider);
+    }
+    .id-stat:last-child { border-right: none; }
+    [data-theme='brutal'] .id-stat { border-right-width: 1.5px; }
+    .id-stat-num {
       font-family: var(--font-life); font-weight: var(--life-weight);
-      font-size: 20px; letter-spacing: -0.03em;
-      font-variant-numeric: tabular-nums; color: var(--text-hi); line-height: 1;
+      font-size: 22px; letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-hi); line-height: 1;
     }
-    @media (min-width: 480px) {
-      .profile-hero-stat { padding: 12px 8px; }
-      .profile-hero-stat-num { font-size: 24px; }
-    }
-    .profile-hero-stat-label {
+    @media (min-width: 480px) { .id-stat-num { font-size: 26px; } }
+    .id-stat-label {
       font-family: var(--font-hud); font-size: 8px;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text-lo); margin-top: 4px;
-    }
-    @media (min-width: 480px) {
-      .profile-hero-stat-label { font-size: 9px; letter-spacing: 0.22em; }
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--text-lo); margin-top: 6px;
     }
 
     .profile-tabs {
@@ -938,6 +1071,7 @@ export class ProfilePage implements OnInit {
   private readonly haptics = inject(HapticsService);
 
   readonly tab = signal<'friends' | 'requests' | 'search' | 'stats'>('friends');
+  readonly perforations = Array.from({ length: 28 });
   readonly searchQuery = signal('');
   readonly errorMsg = signal<string | null>(null);
 

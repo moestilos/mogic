@@ -435,6 +435,9 @@ export class HomePage implements OnInit {
     await this.game.restore();
     await this.profile.load();
     await this.groupsStore.load();
+    if (!this.theme.hasChosen()) {
+      this.pickerOpen.set(true);
+    }
   }
 
   currentThemeName(): string {

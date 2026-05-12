@@ -5,27 +5,12 @@ import { AuthStore } from './core/stores/auth.store';
 import { ThemeStore } from './core/stores/theme.store';
 import { ProfileStore } from './core/stores/profile.store';
 
-const requireTheme = async () => {
-  const theme = inject(ThemeStore);
-  const router = inject(Router);
-  await theme.load();
-  if (!theme.hasChosen()) {
-    void router.navigate(['/onboard-theme']);
-    return false;
-  }
-  return true;
-};
-
 const requireAuth = async () => {
   const theme = inject(ThemeStore);
   const auth = inject(AuthStore);
   const profile = inject(ProfileStore);
   const router = inject(Router);
   await theme.load();
-  if (!theme.hasChosen()) {
-    void router.navigate(['/onboard-theme']);
-    return false;
-  }
   await auth.load();
   const me = auth.me();
   if (!me) {
@@ -39,7 +24,7 @@ const requireAuth = async () => {
 
 export const routes: Routes = [
   { path: 'onboard-theme', loadComponent: () => import('./features/onboard/onboard-theme.page').then((m) => m.OnboardThemePage) },
-  { path: 'sign-in', canActivate: [requireTheme], loadComponent: () => import('./features/auth/sign-in.page').then((m) => m.SignInPage) },
+  { path: 'sign-in', loadComponent: () => import('./features/auth/sign-in.page').then((m) => m.SignInPage) },
   { path: '', canActivate: [requireAuth], loadComponent: () => import('./features/home/home.page').then((m) => m.HomePage) },
   { path: 'new-game', canActivate: [requireAuth], loadComponent: () => import('./features/new-game/new-game.page').then((m) => m.NewGamePage) },
   { path: 'game', canActivate: [requireAuth], loadComponent: () => import('./features/game/game.page').then((m) => m.GamePage) },
