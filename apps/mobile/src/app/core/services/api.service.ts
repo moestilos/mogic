@@ -223,4 +223,10 @@ export class ApiService {
     const data = await this.req<{ result: ApiGroupResult }>(`/api/groups/${groupId}/results`, { method: 'POST', body: input });
     return data.result;
   }
+
+  // ── Admin ────────────────────────────────────────────────
+  async adminListUsers(): Promise<{ id: string; email: string; username: string; displayName: string; color: ApiProfile['color']; avatar: string; createdAt: string }[]> {
+    const data = await this.req<{ users: { id: string; email: string; username: string; displayName: string; color: ApiProfile['color']; avatar: string; createdAt: string }[] }>('/api/admin/users');
+    return data.users;
+  }
 }

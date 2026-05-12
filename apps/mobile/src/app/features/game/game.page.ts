@@ -77,11 +77,16 @@ const GLOW: Record<ManaColor, string> = {
                   </div>
                 </div>
 
-                <div class="flex-1 flex items-center justify-center">
+                <div class="flex-1 flex items-center justify-center relative">
                   <div
                     class="crown-pod-life leading-none text-center"
                     [class.life-pulse]="pulseId() === p.id"
                     [style.font-size]="lifeSize()">{{ p.life }}</div>
+                  @if (deltaFor(p.id); as d) {
+                    <div class="life-delta"
+                         [class.life-delta--down]="d < 0"
+                         [class.life-delta--up]="d > 0">{{ d > 0 ? '+' : '' }}{{ d }}</div>
+                  }
                 </div>
 
                 <div class="flex gap-2 text-[10px] flex-wrap justify-center items-center min-h-[14px]"
@@ -123,6 +128,9 @@ const GLOW: Record<ManaColor, string> = {
             <crown-icon name="Undo2" [size]="18"></crown-icon>
           </button>
           <button class="crown-btn-primary flex-[2.2] py-3 text-[11px] uppercase tracking-widest" (click)="turn()">Pass turn</button>
+          <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="askRestart()" aria-label="Reiniciar partida">
+            <crown-icon name="RotateCcw" [size]="18"></crown-icon>
+          </button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="themePickerOpen.set(true)" aria-label="Theme">
             <crown-icon name="Sparkles" [size]="18"></crown-icon>
           </button>
@@ -131,12 +139,33 @@ const GLOW: Record<ManaColor, string> = {
           </button>
         </div>
 
+        @if (restartConfirm()) {
+          <div class="fixed inset-0 z-[80] flex items-end md:items-center justify-center" (click)="restartConfirm.set(false)">
+            <div class="restart-backdrop"></div>
+            <div class="restart-modal" (click)="$event.stopPropagation()">
+              <div class="restart-eyebrow">
+                <crown-icon name="RotateCcw" [size]="11"></crown-icon> Reiniciar partida
+              </div>
+              <div class="restart-title">¿Empezar de nuevo?</div>
+              <div class="restart-sub">
+                Vidas, contadores y commander damage vuelven a 0.
+                Mismos jugadores, mismo formato. No se puede deshacer.
+              </div>
+              <div class="restart-actions">
+                <button class="crown-btn flex-1 py-3 text-[11px] uppercase tracking-widest" (click)="restartConfirm.set(false)">Cancelar</button>
+                <button class="crown-btn-primary flex-1 py-3 text-[11px] uppercase tracking-widest" (click)="confirmRestart()">Reiniciar</button>
+              </div>
+            </div>
+          </div>
+        }
+
         @if (drawerPlayer(); as p) {
           <app-counter-drawer
             [player]="p"
             (close)="drawerPid.set(null)"
             (change)="changeCounter(p.id, $event.counter, $event.delta)"
             (changeLife)="bumpDelta(p, $event)"
+            (resetLife)="resetPlayerLife(p.id)"
             (openCmdDamage)="openCmdDamage(p.id)" />
         }
 
@@ -171,7 +200,80 @@ const GLOW: Record<ManaColor, string> = {
     :host { display: block; height: 100%; }
     .life-pulse { animation: lifePulse 200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
     @keyframes lifePulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
-    /* No flash background — solo cambia el número (haptic + life-pulse anim hace feedback) */
+
+    /* Floating life delta indicator */
+    .life-delta {
+      position: absolute;
+      top: 50%;
+      right: 8%;
+      transform: translateY(-50%);
+      font-family: var(--font-life, 'Space Grotesk'), sans-serif;
+      font-weight: 700;
+      font-size: clamp(20px, 4vmin, 38px);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+      animation: deltaFloat 1400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      text-shadow: 0 0 14px currentColor;
+      opacity: 0;
+    }
+    .life-delta--up   { color: #62e08a; }
+    .life-delta--down { color: #ff6b6b; }
+    [data-theme='brutal'] .life-delta { font-weight: 900; text-shadow: none; }
+    @keyframes deltaFloat {
+      0%   { opacity: 0; transform: translateY(-30%) scale(0.7); }
+      18%  { opacity: 1; transform: translateY(-50%) scale(1.05); }
+      30%  { transform: translateY(-50%) scale(1); }
+      80%  { opacity: 1; transform: translateY(-65%) scale(1); }
+      100% { opacity: 0; transform: translateY(-90%) scale(0.95); }
+    }
+
+    /* Restart match modal */
+    .restart-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 0;
+    }
+    .restart-modal {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 26rem;
+      padding: 22px;
+      margin: 0 auto;
+      background: var(--bg-elevated, #0c0c12);
+      border: 1px solid var(--divider, rgba(255,255,255,0.1));
+      border-radius: 18px 18px 0 0;
+      color: var(--text-hi, #f5f5fa);
+    }
+    @media (min-width: 768px) { .restart-modal { border-radius: 18px; margin-bottom: 2rem; } }
+    [data-theme='brutal'] .restart-modal { border-radius: 0; border-width: 2px; box-shadow: 6px 6px 0 0 var(--text-hi); }
+    .restart-eyebrow {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-hud, 'JetBrains Mono'), monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-lo, #8a8a98);
+    }
+    .restart-title {
+      font-family: var(--font-display, 'Space Grotesk'), sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-top: 6px;
+      color: var(--text-hi, #f5f5fa);
+    }
+    .restart-sub {
+      font-size: 13px;
+      color: var(--text-mid, #c4c4d0);
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+    .restart-actions {
+      display: flex; gap: 8px;
+      margin-top: 18px;
+    }
   `],
 })
 export class GamePage implements OnInit, OnDestroy {
@@ -187,12 +289,16 @@ export class GamePage implements OnInit, OnDestroy {
   readonly cmdMatrixPid = signal<string | null>(null);
   readonly themePickerOpen = signal(false);
   readonly viewportTall = signal(true);
+  readonly restartConfirm = signal(false);
+  readonly deltaMap = signal<Record<string, number>>({});
 
   private holdTimer: ReturnType<typeof setTimeout> | null = null;
   private holdFired = false;
   private pointerStart = 0;
   private currentPointerId: number | null = null;
   private lastBumpAt = 0;
+  private deltaTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly DELTA_WINDOW_MS = 1400;
 
   constructor() {
     // Cuando el juego termina, cerrar todos los modals para que solo se vea Mythic Moment
@@ -336,10 +442,61 @@ export class GamePage implements OnInit, OnDestroy {
     this.store.life(p.id, delta);
     this.pulseId.set(p.id);
     setTimeout(() => this.pulseId.set(null), 220);
+    this.accumDelta(p.id, delta);
     const mag = Math.abs(delta);
     if (mag >= 5) void this.haptics.medium();
     else void this.haptics.light();
     if (p.life + delta <= 0) void this.haptics.heavy();
+  }
+
+  deltaFor(pid: string): number | null {
+    const v = this.deltaMap()[pid];
+    return v && v !== 0 ? v : null;
+  }
+
+  private accumDelta(pid: string, delta: number) {
+    const current = this.deltaMap()[pid] ?? 0;
+    const next = current + delta;
+    this.deltaMap.set({ ...this.deltaMap(), [pid]: next });
+    const existing = this.deltaTimers.get(pid);
+    if (existing) clearTimeout(existing);
+    const t = setTimeout(() => {
+      const map = { ...this.deltaMap() };
+      delete map[pid];
+      this.deltaMap.set(map);
+      this.deltaTimers.delete(pid);
+    }, this.DELTA_WINDOW_MS);
+    this.deltaTimers.set(pid, t);
+  }
+
+  resetPlayerLife(pid: string) {
+    const g = this.store.game();
+    if (!g) return;
+    void this.haptics.medium();
+    this.store.setLife(pid, g.startingLife);
+    // Clear any in-flight delta indicator for this player
+    const map = { ...this.deltaMap() };
+    delete map[pid];
+    this.deltaMap.set(map);
+    const t = this.deltaTimers.get(pid);
+    if (t) { clearTimeout(t); this.deltaTimers.delete(pid); }
+    this.pulseId.set(pid);
+    setTimeout(() => this.pulseId.set(null), 220);
+  }
+
+  askRestart() {
+    if (this.store.isOver()) return;
+    void this.haptics.warning();
+    this.restartConfirm.set(true);
+  }
+
+  confirmRestart() {
+    void this.haptics.heavy();
+    this.store.restartMatch();
+    this.deltaMap.set({});
+    for (const t of this.deltaTimers.values()) clearTimeout(t);
+    this.deltaTimers.clear();
+    this.restartConfirm.set(false);
   }
 
   openDrawer(p: Player, ev: Event) {

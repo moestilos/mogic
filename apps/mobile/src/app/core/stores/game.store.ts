@@ -62,6 +62,22 @@ export class GameStore {
     this.mutate((g) => adjustLife(g, pid, delta));
   }
 
+  setLife(pid: string, value: number): void {
+    this.mutate((g) => {
+      const p = g.players.find((x) => x.id === pid);
+      if (!p) return g;
+      return adjustLife(g, pid, value - p.life);
+    });
+  }
+
+  restartMatch(): void {
+    this.mutate((g) => createGame({
+      format: g.format,
+      startingLife: g.startingLife,
+      players: g.players.map((p) => ({ name: p.name, color: p.color, avatar: p.avatar })),
+    }));
+  }
+
   counter(pid: string, c: CounterType, delta: number): void {
     this.mutate((g) => adjustCounter(g, pid, c, delta));
   }

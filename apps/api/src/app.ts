@@ -4,6 +4,7 @@ import auth from './routes/auth';
 import friends from './routes/friends';
 import friendRequests from './routes/friend-requests';
 import groups from './routes/groups';
+import admin from './routes/admin';
 
 const app = new Hono().basePath('/api');
 
@@ -21,6 +22,7 @@ app.route('/auth', auth);
 app.route('/friends', friends);
 app.route('/friend-requests', friendRequests);
 app.route('/groups', groups);
+app.route('/admin', admin);
 
 app.onError((err, c) => {
   console.error('[mogic-api]', err);

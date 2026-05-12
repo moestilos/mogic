@@ -409,6 +409,8 @@ export class AdminPage implements OnInit {
 
   async refresh() {
     void this.haptics.light();
+    // Pull all registered users from server (admin only). Falls back to local list.
+    await this.auth.adminLoadRemoteUsers();
     const rows: { key: string; size: number }[] = [];
     let groups = 0, games = 0;
     const keys = ['mogic.accounts', 'mogic.session', 'mogic.friendRequests', 'mogic.notifications',

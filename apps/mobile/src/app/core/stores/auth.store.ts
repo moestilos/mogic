@@ -25,6 +25,10 @@ export class AuthStore {
   private readonly api = inject(ApiService);
 
   private readonly _accounts = signal<Account[]>([]);
+  private readonly _remoteAdminUsers = signal<{
+    id: string; email: string; username: string; displayName: string;
+    color: ManaColor; avatar: string; createdAt: number;
+  }[]>([]);
   private readonly _sessionId = signal<string | null>(null);
   private readonly _loaded = signal(false);
 
@@ -52,8 +56,11 @@ export class AuthStore {
     return me.email.toLowerCase() === 'gmateosoficial@gmail.com';
   });
 
-  /** Full accounts list (no password hash) — only for admin views. */
+  /** Full accounts list. For admin: prefer remote (all users from server),
+   *  fall back to local accounts when remote list is empty. */
   readonly allAccounts = computed(() => {
+    const remote = this._remoteAdminUsers();
+    if (remote.length > 0) return remote;
     return this._accounts().map((a) => ({
       id: a.id,
       email: a.email,
@@ -65,10 +72,31 @@ export class AuthStore {
     }));
   });
 
+  async adminLoadRemoteUsers(): Promise<{ error: string | null }> {
+    if (!this.isAdmin()) return { error: 'no admin' };
+    if (!this.api.enabled) return { error: 'api off' };
+    try {
+      const rows = await this.api.adminListUsers();
+      this._remoteAdminUsers.set(rows.map((r) => ({
+        id: r.id,
+        email: r.email,
+        username: r.username,
+        displayName: r.displayName,
+        color: r.color as ManaColor,
+        avatar: r.avatar,
+        createdAt: typeof r.createdAt === 'string' ? new Date(r.createdAt).getTime() : Number(r.createdAt) || Date.now(),
+      })));
+      return { error: null };
+    } catch (e: any) {
+      return { error: String(e?.message ?? e) };
+    }
+  }
+
   async adminDeleteAccount(accountId: string): Promise<void> {
     if (!this.isAdmin()) return;
     if (accountId === this._sessionId()) return; // no self-delete via admin
     this._accounts.set(this._accounts().filter((a) => a.id !== accountId));
+    this._remoteAdminUsers.set(this._remoteAdminUsers().filter((a) => a.id !== accountId));
     await this.persistAccounts();
   }
 

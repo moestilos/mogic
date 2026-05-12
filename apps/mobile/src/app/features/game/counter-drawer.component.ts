@@ -47,6 +47,10 @@ const COUNTERS: CounterDef[] = [
             <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+5)">+5</button>
             <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+10)">+10</button>
           </div>
+          <button class="cd-reset-life" (click)="resetLife.emit()">
+            <crown-icon name="RotateCcw" [size]="12"></crown-icon>
+            Restaurar vida inicial
+          </button>
         </div>
 
         <!-- COUNTERS -->
@@ -251,6 +255,24 @@ const COUNTERS: CounterDef[] = [
     }
     .cd-cmd-btn:hover { background: rgba(255,122,122,0.15); }
 
+    .cd-reset-life {
+      width: 100%;
+      margin-top: 8px;
+      padding: 9px 12px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: transparent;
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #c4c4d0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+    .cd-reset-life:hover { background: rgba(255,255,255,0.04); color: #f5f5fa; border-color: rgba(255,255,255,0.35); }
+
     @keyframes chromeFlow {
       0% { background-position: 0% 50%; }
       100% { background-position: 300% 50%; }
@@ -262,6 +284,7 @@ export class CounterDrawerComponent {
   @Output() readonly close = new EventEmitter<void>();
   @Output() readonly change = new EventEmitter<{ counter: CounterType; delta: number }>();
   @Output() readonly changeLife = new EventEmitter<number>();
+  @Output() readonly resetLife = new EventEmitter<void>();
   @Output() readonly openCmdDamage = new EventEmitter<void>();
 
   readonly counters = COUNTERS;
