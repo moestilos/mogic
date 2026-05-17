@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\gmate\\\\Desktop\\\\claudeworkspace\\\\apps\\\\crown\" -Recurse -Name)",
+      "Bash(Select-Object -First 50)",
+      "Bash(dir \"C:\\\\Users\\\\gmate\\\\.claude\")",
+      "Bash(dir *)",
+      "Read(//mnt/c/Users/gmate/Desktop/claudeworkspace/**)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__execute_sql",
+      "mcp__claude_ai_Vercel__get_project",
+      "mcp__claude_ai_Vercel__get_runtime_logs",
+      "mcp__claude_ai_Supabase__apply_migration"
+    ]
+  }
+}

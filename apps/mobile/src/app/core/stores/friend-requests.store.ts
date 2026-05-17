@@ -60,6 +60,7 @@ export class FriendRequestsStore {
   });
 
   async reload(): Promise<void> {
+    if (!this.api.enabled) return;
     this._loaded.set(false);
     await this.load();
   }

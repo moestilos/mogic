@@ -375,7 +375,6 @@ export class GamePage implements OnInit, OnDestroy {
 
   pipFor(c: ManaColor) { return PIP[c]; }
   glowFor(c: ManaColor): string { return GLOW[c]; }
-  isActive(pid: string): boolean { return this.store.activePlayer()?.id === pid; }
   romanFor(idx: number): string {
     return ['I','II','III','IV','V','VI'][idx] ?? String(idx + 1);
   }
@@ -528,7 +527,6 @@ export class GamePage implements OnInit, OnDestroy {
     this.store.cmdDamage(fromPid, toPid, delta);
   }
 
-  turn() { void this.haptics.medium(); this.store.nextTurn(); }
   undo() { void this.haptics.light(); this.store.undo(); }
 
   async finish() {

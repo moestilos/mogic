@@ -50,13 +50,16 @@ app.post('/', async (c) => {
   if (parsed.data.toUserId === u.sub) return c.json({ error: 'cannot friend self' }, 400);
 
   const existing = await db.select().from(friendRequests).where(
-    or(
-      and(eq(friendRequests.fromUserId, u.sub), eq(friendRequests.toUserId, parsed.data.toUserId)),
-      and(eq(friendRequests.fromUserId, parsed.data.toUserId), eq(friendRequests.toUserId, u.sub)),
+    and(
+      or(
+        and(eq(friendRequests.fromUserId, u.sub), eq(friendRequests.toUserId, parsed.data.toUserId)),
+        and(eq(friendRequests.fromUserId, parsed.data.toUserId), eq(friendRequests.toUserId, u.sub)),
+      ),
+      or(eq(friendRequests.status, 'pending'), eq(friendRequests.status, 'accepted')),
     )
-  ).orderBy(desc(friendRequests.createdAt));
-  if (existing.some((r) => r.status === 'pending')) return c.json({ error: 'request pending' }, 409);
+  ).limit(1);
   if (existing.some((r) => r.status === 'accepted')) return c.json({ error: 'already friends' }, 409);
+  if (existing.some((r) => r.status === 'pending')) return c.json({ error: 'request pending' }, 409);
 
   const [req] = await db.insert(friendRequests).values({
     fromUserId: u.sub,
