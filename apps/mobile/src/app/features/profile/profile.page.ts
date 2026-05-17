@@ -74,7 +74,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
             <div class="id-card-stats">
               <div class="id-stat">
                 <div class="id-stat-num crown-text-accent">{{ totalWins() }}</div>
-                <div class="id-stat-label">Wins</div>
+                <div class="id-stat-label">Victorias</div>
               </div>
               <div class="id-stat">
                 <div class="id-stat-num">{{ totalGames() }}</div>
@@ -88,7 +88,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 <div class="id-stat-num crown-text-danger flex items-center gap-1 justify-center">
                   <crown-icon name="Flame" [size]="16"></crown-icon>{{ bestStreak() }}
                 </div>
-                <div class="id-stat-label">Best</div>
+                <div class="id-stat-label">Racha</div>
               </div>
             </div>
           </div>
@@ -110,7 +110,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 <crown-icon name="Search" [size]="14"></crown-icon> Buscar
               </button>
               <button class="profile-tab" [class.is-on]="tab() === 'stats'" (click)="tab.set('stats')">
-                <crown-icon name="Trophy" [size]="14"></crown-icon> Stats
+                <crown-icon name="Trophy" [size]="14"></crown-icon> Estadísticas
               </button>
             </div>
           </div>
@@ -132,7 +132,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 <div class="profile-toolbar mb-3">
                   <div class="profile-sort">
                     <button class="profile-sort-chip" [class.is-on]="friendSort() === 'wins'"   (click)="friendSort.set('wins')">
-                      <crown-icon name="Trophy" [size]="11"></crown-icon> Wins
+                      <crown-icon name="Trophy" [size]="11"></crown-icon> Victorias
                     </button>
                     <button class="profile-sort-chip" [class.is-on]="friendSort() === 'games'"  (click)="friendSort.set('games')">
                       <crown-icon name="Dices" [size]="11"></crown-icon> Partidas
@@ -345,7 +345,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
                 <div class="profile-stat-card">
                   <div class="profile-stat-icon"><crown-icon name="Flame" [size]="16" cls="crown-text-danger"></crown-icon></div>
                   <div class="profile-stat-num">{{ bestStreak() }}</div>
-                  <div class="profile-stat-label">Best</div>
+                  <div class="profile-stat-label">Racha</div>
                 </div>
               </div>
 
@@ -353,7 +353,7 @@ const COLORS: ManaColor[] = ['W', 'U', 'B', 'R', 'G', 'C'];
               @if (topFriend(); as top) {
                 <div>
                   <div class="crown-hud mb-2.5 flex items-center gap-1.5">
-                    <crown-icon name="Trophy" [size]="11" cls="crown-text-accent"></crown-icon> King of the table
+                    <crown-icon name="Trophy" [size]="11" cls="crown-text-accent"></crown-icon> Rey de la mesa
                   </div>
                   <player-card
                     size="lg"

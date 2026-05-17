@@ -192,7 +192,7 @@ interface Slot {
             <div class="picker-modal" (click)="$event.stopPropagation()">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <div class="crown-hud">Slot {{ (pickerOpen() ?? 0) + 1 }}</div>
+                  <div class="crown-hud">Plaza {{ (pickerOpen() ?? 0) + 1 }}</div>
                   <div class="picker-title">Elige amigo</div>
                 </div>
                 <button class="profile-icon-btn" (click)="pickerOpen.set(null)" aria-label="Cerrar">
@@ -492,7 +492,7 @@ export class NewGamePage implements OnInit {
       // Casual: prefill first slot with user name if available, rest with Player N
       if (me) arr.push({ name: me.displayName, color: me.color, avatar: me.avatar, source: null });
       for (let i = arr.length; i < n; i++) {
-        arr.push({ name: `Player ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
+        arr.push({ name: `Jugador ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
       }
     }
     this.slots.set(arr);
@@ -505,7 +505,7 @@ export class NewGamePage implements OnInit {
     for (let i = 0; i < n; i++) {
       if (i < current.length) next.push(current[i]);
       else if (this.mode() === 'casual') {
-        next.push({ name: `Player ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
+        next.push({ name: `Jugador ${i + 1}`, color: COLORS[i % COLORS.length], avatar: 'User', source: null });
       } else {
         next.push({ name: '', color: 'C', avatar: 'User', source: null });
       }
@@ -570,7 +570,7 @@ export class NewGamePage implements OnInit {
     const slots = this.slots();
     this.store.start({
       format: this.format(),
-      players: slots.map((s) => ({ name: s.name.trim() || `Player`, color: s.color })),
+      players: slots.map((s) => ({ name: s.name.trim() || `Jugador`, color: s.color })),
     });
     const snap = this.store.game();
     sessionStorage.setItem('crown.gameMode', this.mode());

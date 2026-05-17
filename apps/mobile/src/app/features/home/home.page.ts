@@ -96,7 +96,7 @@ import { MagicGuideComponent } from '../../shared/magic-guide.component';
           <div class="home-stat">
             <crown-icon name="Trophy" [size]="14" cls="crown-text-accent"></crown-icon>
             <div class="home-stat-num">{{ totalWins() }}</div>
-            <div class="home-stat-label">Wins</div>
+            <div class="home-stat-label">Victorias</div>
           </div>
           <div class="home-stat">
             <crown-icon name="Dices" [size]="14" cls="crown-text-mid"></crown-icon>
@@ -122,8 +122,8 @@ import { MagicGuideComponent } from '../../shared/magic-guide.component';
                 <div class="crown-hud crown-text-accent">Continúa partida</div>
                 <div class="crown-display text-2xl mt-1">{{ game.players().length }} jugadores</div>
                 <div class="crown-text-lo text-xs mt-1 flex items-center gap-1.5">
-                  <crown-icon name="ChevronLeft" [size]="11" cls="crown-text-lo"></crown-icon>
-                  Turno: <span class="crown-text-mid">{{ game.activePlayer()?.name }}</span>
+                  <crown-icon name="Heart" [size]="11" cls="crown-text-lo"></crown-icon>
+                  {{ game.players()[0]?.life ?? 40 }} · {{ game.players()[1]?.life ?? 40 }}@if (game.players().length > 2) { · {{ game.players()[2]?.life ?? 40 }}}@if (game.players().length > 3) { · {{ game.players()[3]?.life ?? 40 }}}
                 </div>
               </div>
               <div class="crown-text-accent">
@@ -162,7 +162,7 @@ import { MagicGuideComponent } from '../../shared/magic-guide.component';
                 {{ groupsCount() }} <span class="crown-text-lo text-base">grupos</span>
               } @else { Grupos }
             </div>
-            <div class="home-tile-sub">Standings · streaks</div>
+            <div class="home-tile-sub">Clasificación · rachas</div>
           </button>
 
           <button class="home-tile crown-pod text-left transition active:scale-[0.98]"
@@ -176,18 +176,9 @@ import { MagicGuideComponent } from '../../shared/magic-guide.component';
                 {{ profile.friends().length }} <span class="crown-text-lo text-base">jugadores</span>
               } @else { Añadir }
             </div>
-            <div class="home-tile-sub">Win tracking auto</div>
+            <div class="home-tile-sub">Registro de victorias</div>
           </button>
 
-          <button class="home-tile crown-pod text-left transition opacity-60"
-                  disabled>
-            <div class="home-tile-icon">
-              <crown-icon name="Scroll" [size]="28" cls="crown-text-lo"></crown-icon>
-            </div>
-            <div class="crown-hud mt-3">Historia</div>
-            <div class="home-tile-title">Partidas</div>
-            <div class="home-tile-sub">Pronto</div>
-          </button>
         </section>
 
         <!-- ── Theme strip ──────────────────────────────────── -->
