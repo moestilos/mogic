@@ -8,7 +8,13 @@ import { authRequired, getUser } from '../middleware';
 const sendSchema = z.object({ toUserId: z.string().uuid() });
 const idSchema = z.object({ id: z.string().uuid() });
 
-const app = new Hono();
+const app = new Hono({ strict: false });
+
+app.use(async (c, next) => {
+  console.log('[fr] method:', c.req.method, 'path:', c.req.path, 'url:', c.req.url);
+  await next();
+});
+
 app.use(authRequired);
 
 app.get('/search', async (c) => {
