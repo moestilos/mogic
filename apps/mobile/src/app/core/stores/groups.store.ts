@@ -111,22 +111,26 @@ export class GroupsStore {
     await this.storage.saveGroupResults(nextResults);
   }
 
-  async addProfile(groupId: string, name: string, color: ManaColor): Promise<void> {
+  async addProfile(groupId: string, name: string, color: ManaColor, avatar = 'User', friendId?: string): Promise<void> {
     if (this.api.enabled) {
       try {
-        const r = await this.api.addGroupProfile(groupId, { displayName: name, color, avatar: 'User' });
+        const r = await this.api.addGroupProfile(groupId, { displayName: name, color, avatar, friendId });
         const updated = this._groups().map((g) =>
-          g.id === groupId ? { ...g, profiles: [...g.profiles, { id: r.id, name: r.displayName, color: r.color, avatar: r.avatar ?? 'User', createdAt: Date.now() }] } : g
+          g.id === groupId ? { ...g, profiles: [...g.profiles, { id: r.id, name: r.displayName, color: r.color as ManaColor, avatar: r.avatar ?? 'User', createdAt: Date.now() }] } : g
         );
         this._groups.set(updated);
         return;
       } catch (e) { console.warn('[mogic] addGroupProfile api failed', e); }
     }
     const updated = this._groups().map((g) =>
-      g.id === groupId ? addProfile(g, { name, color }) : g,
+      g.id === groupId ? addProfile(g, { name, color, avatar }) : g,
     );
     this._groups.set(updated);
     await this.storage.saveGroups(updated);
+  }
+
+  async addProfileFromFriend(groupId: string, friend: { id: string; name: string; color: ManaColor; avatar: string }): Promise<void> {
+    return this.addProfile(groupId, friend.name, friend.color, friend.avatar, friend.id);
   }
 
   async removeProfile(groupId: string, profileId: string): Promise<void> {

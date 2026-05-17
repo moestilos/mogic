@@ -120,6 +120,16 @@ const GLOW: Record<ManaColor, string> = {
           }
         </div>
 
+        <!-- Group context strip -->
+        @if (groups.activeGroup(); as g) {
+          <div class="flex items-center gap-2 px-3 py-1.5 flex-shrink-0 relative z-10"
+               style="background: var(--bg-base); border-top: 1px solid var(--divider);">
+            <crown-icon [name]="$any(groupIcon(g.emoji))" [size]="11" cls="crown-text-accent"></crown-icon>
+            <span class="crown-hud crown-text-accent" style="font-size: 10px; letter-spacing: 0.14em;">{{ g.name }}</span>
+            <span class="crown-text-lo" style="font-family: var(--font-hud); font-size: 10px; letter-spacing: 0.1em;">· PARTIDA DE GRUPO</span>
+          </div>
+        }
+
         <!-- Bottom bar -->
         <div class="flex items-center gap-1 px-1.5 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] flex-shrink-0 relative z-10"
              style="border-top: 1px solid var(--divider); background: var(--bg-base);">
@@ -283,7 +293,7 @@ const GLOW: Record<ManaColor, string> = {
 })
 export class GamePage implements OnInit, OnDestroy {
   readonly store = inject(GameStore);
-  private readonly groups = inject(GroupsStore);
+  readonly groups = inject(GroupsStore);
   private readonly profile = inject(ProfileStore);
   private readonly haptics = inject(HapticsService);
   private readonly router = inject(Router);
@@ -371,6 +381,11 @@ export class GamePage implements OnInit, OnDestroy {
   @HostListener('window:resize')
   updateOrientation() {
     this.viewportTall.set(window.innerHeight >= window.innerWidth);
+  }
+
+  groupIcon(emoji: string | undefined): string {
+    if (!emoji) return 'Crown';
+    return emoji.length > 4 ? emoji : 'Crown';
   }
 
   pipFor(c: ManaColor) { return PIP[c]; }

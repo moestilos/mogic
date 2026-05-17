@@ -40,12 +40,12 @@ import {
   // Festive
   PartyPopper, Gift,
   // Arrows
-  ArrowUp, ArrowDown,
+  ArrowUp, ArrowDown, ChevronRight,
 } from 'lucide-angular';
 
 export const Icons = {
   Crown, Sparkles, Settings, X, Plus, Minus, Undo2, RotateCw,
-  Search, ChevronLeft, LogIn, LogOut, Mail, Lock, Trash2, Check,
+  Search, ChevronLeft, ChevronRight, LogIn, LogOut, Mail, Lock, Trash2, Check,
   User, UserPlus, Users,
   Dice5, Dices, Zap, Star, Skull, CloudLightning, Radiation, PlusCircle,
   Swords, Sword, Shield, Axe, Hammer, Flag, Target, Crosshair,
