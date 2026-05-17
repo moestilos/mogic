@@ -6,7 +6,7 @@ import friendRequests from './routes/friend-requests';
 import groups from './routes/groups';
 import admin from './routes/admin';
 
-const app = new Hono().basePath('/api');
+const app = new Hono({ strict: false }).basePath('/api');
 
 app.use('*', cors({
   origin: '*',
