@@ -54,12 +54,9 @@ app.post('/', async (c) => {
       and(eq(friendRequests.fromUserId, u.sub), eq(friendRequests.toUserId, parsed.data.toUserId)),
       and(eq(friendRequests.fromUserId, parsed.data.toUserId), eq(friendRequests.toUserId, u.sub)),
     )
-  ).limit(1);
-  if (existing.length > 0) {
-    const r = existing[0];
-    if (r.status === 'pending') return c.json({ error: 'request pending' }, 409);
-    if (r.status === 'accepted') return c.json({ error: 'already friends' }, 409);
-  }
+  ).orderBy(desc(friendRequests.createdAt));
+  if (existing.some((r) => r.status === 'pending')) return c.json({ error: 'request pending' }, 409);
+  if (existing.some((r) => r.status === 'accepted')) return c.json({ error: 'already friends' }, 409);
 
   const [req] = await db.insert(friendRequests).values({
     fromUserId: u.sub,

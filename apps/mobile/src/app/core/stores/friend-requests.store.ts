@@ -59,6 +59,11 @@ export class FriendRequestsStore {
     );
   });
 
+  async reload(): Promise<void> {
+    this._loaded.set(false);
+    await this.load();
+  }
+
   async load(): Promise<void> {
     if (this._loaded()) return;
     if (this.api.enabled) {
@@ -130,11 +135,13 @@ export class FriendRequestsStore {
   hasRelation(targetAccountId: string): 'none' | 'sent' | 'received' | 'friends' {
     const me = this.auth.me();
     if (!me) return 'none';
-    const r = this._requests().find((req) =>
+    const matches = this._requests().filter((req) =>
       (req.fromAccountId === me.id && req.toAccountId === targetAccountId) ||
       (req.fromAccountId === targetAccountId && req.toAccountId === me.id)
     );
-    if (!r) return 'none';
+    if (matches.length === 0) return 'none';
+    // Pick the most recent request (handles declined/cancelled → re-sent cases)
+    const r = matches.reduce((a, b) => (b.createdAt > a.createdAt ? b : a));
     if (r.status === 'accepted') return 'friends';
     if (r.status === 'pending') return r.fromAccountId === me.id ? 'sent' : 'received';
     return 'none';

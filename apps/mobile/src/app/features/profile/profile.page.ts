@@ -1455,6 +1455,10 @@ export class ProfilePage implements OnInit {
     if (!me) void this.router.navigate(['/sign-in']);
   }
 
+  async ionViewWillEnter() {
+    await this.requests.reload();
+  }
+
   accountInfo(id: string) { return this.auth.accountById(id); }
   relationFor(id: string) { return this.requests.hasRelation(id); }
 
