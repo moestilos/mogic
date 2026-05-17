@@ -33,7 +33,7 @@ const newResultSchema = z.object({
   placements: placementsSchema,
 });
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 app.use(authRequired);
 
 async function ownsGroup(userId: string, groupId: string): Promise<boolean> {

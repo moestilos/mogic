@@ -22,7 +22,7 @@ const winInputSchema = z.object({
   participantFriendIds: z.array(z.string().uuid()).default([]),
 });
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 app.use(authRequired);
 
 app.get('/', async (c) => {
