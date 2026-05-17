@@ -9,7 +9,7 @@ const sendSchema = z.object({ toUserId: z.string().uuid() });
 const idSchema = z.object({ id: z.string().uuid() });
 
 const app = new Hono();
-app.use('*', authRequired);
+app.use(authRequired);
 
 app.get('/search', async (c) => {
   const u = getUser(c);

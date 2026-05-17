@@ -23,7 +23,7 @@ const winInputSchema = z.object({
 });
 
 const app = new Hono();
-app.use('*', authRequired);
+app.use(authRequired);
 
 app.get('/', async (c) => {
   const u = getUser(c);

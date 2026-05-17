@@ -34,7 +34,7 @@ const newResultSchema = z.object({
 });
 
 const app = new Hono();
-app.use('*', authRequired);
+app.use(authRequired);
 
 async function ownsGroup(userId: string, groupId: string): Promise<boolean> {
   const [g] = await db.select({ id: schema.groups.id }).from(schema.groups)
