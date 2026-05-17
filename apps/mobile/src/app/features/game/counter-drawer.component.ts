@@ -48,7 +48,7 @@ const COUNTERS: CounterDef[] = [
             <button class="cd-btn cd-btn-pos" (click)="changeLife.emit(+10)">+10</button>
           </div>
           <button class="cd-reset-life" (click)="resetLife.emit()">
-            <crown-icon name="RotateCcw" [size]="12"></crown-icon>
+            <crown-icon name="RotateCw" [size]="12"></crown-icon>
             Restaurar vida inicial
           </button>
         </div>

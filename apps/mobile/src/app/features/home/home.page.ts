@@ -11,11 +11,12 @@ import { InstallPromptService } from '../../shared/install-prompt.service';
 import { ThemePickerComponent } from '../../shared/theme-picker.component';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
+import { MagicGuideComponent } from '../../shared/magic-guide.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [IonContent, NgClass, ThemePickerComponent, AnimatedBackgroundComponent, IconComponent],
+  imports: [IonContent, NgClass, ThemePickerComponent, AnimatedBackgroundComponent, IconComponent, MagicGuideComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
       <div class="min-h-screen px-5 md:px-12 lg:px-20 pt-[max(env(safe-area-inset-top),1.5rem)] pb-[max(env(safe-area-inset-bottom),2rem)] max-w-6xl mx-auto relative"
@@ -44,6 +45,11 @@ import { IconComponent } from '../../shared/icon.component';
                     [attr.aria-label]="'Tema: ' + currentThemeName()"
                     [title]="currentThemeName()">
               <crown-icon name="Sparkles" [size]="18"></crown-icon>
+            </button>
+            <button class="home-icon-btn"
+                    (click)="guideOpen.set(true)"
+                    aria-label="Guía Magic">
+              <crown-icon name="BookOpen" [size]="18"></crown-icon>
             </button>
             <button class="home-icon-btn"
                     (click)="openProfile()"
@@ -207,6 +213,10 @@ import { IconComponent } from '../../shared/icon.component';
 
       @if (pickerOpen()) {
         <app-theme-picker (close)="pickerOpen.set(false)" />
+      }
+
+      @if (guideOpen()) {
+        <app-magic-guide (close)="guideOpen.set(false)" />
       }
     </ion-content>
   `,
@@ -422,6 +432,7 @@ export class HomePage implements OnInit {
   private readonly router = inject(Router);
 
   readonly pickerOpen = signal(false);
+  readonly guideOpen = signal(false);
 
   readonly totalWins = computed(() =>
     this.profile.friends().reduce((sum, f) => sum + f.wins, 0)

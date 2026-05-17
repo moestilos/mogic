@@ -1,5 +1,4 @@
 import { Component, computed, effect, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import type { CounterType, ManaColor, Player } from '@crown/game-engine';
@@ -12,6 +11,7 @@ import { CmdDamageMatrixComponent } from './cmd-damage-matrix.component';
 import { ThemePickerComponent } from '../../shared/theme-picker.component';
 import { AnimatedBackgroundComponent } from '../../shared/animated-background.component';
 import { IconComponent } from '../../shared/icon.component';
+import { MagicGuideComponent } from '../../shared/magic-guide.component';
 
 const PIP: Record<ManaColor, string> = { W: 'w', U: 'u', B: 'b', R: 'r', G: 'g', C: 'c' };
 
@@ -27,7 +27,7 @@ const GLOW: Record<ManaColor, string> = {
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [IonContent, NgClass, CounterDrawerComponent, CmdDamageMatrixComponent, ThemePickerComponent, AnimatedBackgroundComponent, IconComponent],
+  imports: [IonContent, CounterDrawerComponent, CmdDamageMatrixComponent, ThemePickerComponent, AnimatedBackgroundComponent, IconComponent, MagicGuideComponent],
   template: `
     <ion-content [fullscreen]="true" class="ion-no-padding">
       <div class="h-screen w-screen flex flex-col overflow-hidden relative" style="background: var(--bg-base); padding-top: env(safe-area-inset-top, 0); padding-left: env(safe-area-inset-left, 0); padding-right: env(safe-area-inset-right, 0);">
@@ -40,7 +40,6 @@ const GLOW: Record<ManaColor, string> = {
           @for (p of store.players(); track p.id; let i = $index) {
             <div
               class="crown-pod relative min-w-0 min-h-0 overflow-hidden select-none touch-manipulation"
-              [class.is-active]="isActive(p.id) && !p.eliminated"
               [class.is-out]="p.eliminated"
               [style.--pod-glow]="glowFor(p.color)">
 
@@ -129,10 +128,13 @@ const GLOW: Record<ManaColor, string> = {
           </button>
           <button class="crown-btn-primary flex-[2.2] py-3 text-[11px] uppercase tracking-widest" (click)="turn()">Pass turn</button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="askRestart()" aria-label="Reiniciar partida">
-            <crown-icon name="RotateCcw" [size]="18"></crown-icon>
+            <crown-icon name="RotateCw" [size]="18"></crown-icon>
           </button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="themePickerOpen.set(true)" aria-label="Theme">
             <crown-icon name="Sparkles" [size]="18"></crown-icon>
+          </button>
+          <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="guideOpen.set(true)" aria-label="Guía Magic">
+            <crown-icon name="BookOpen" [size]="18"></crown-icon>
           </button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="exit()" aria-label="Exit">
             <crown-icon name="X" [size]="18"></crown-icon>
@@ -144,7 +146,7 @@ const GLOW: Record<ManaColor, string> = {
             <div class="restart-backdrop"></div>
             <div class="restart-modal" (click)="$event.stopPropagation()">
               <div class="restart-eyebrow">
-                <crown-icon name="RotateCcw" [size]="11"></crown-icon> Reiniciar partida
+                <crown-icon name="RotateCw" [size]="11"></crown-icon> Reiniciar partida
               </div>
               <div class="restart-title">¿Empezar de nuevo?</div>
               <div class="restart-sub">
@@ -179,6 +181,10 @@ const GLOW: Record<ManaColor, string> = {
 
         @if (themePickerOpen()) {
           <app-theme-picker (close)="themePickerOpen.set(false)" />
+        }
+
+        @if (guideOpen()) {
+          <app-magic-guide (close)="guideOpen.set(false)" />
         }
 
         @if (store.isOver()) {
@@ -288,6 +294,7 @@ export class GamePage implements OnInit, OnDestroy {
   readonly drawerPid = signal<string | null>(null);
   readonly cmdMatrixPid = signal<string | null>(null);
   readonly themePickerOpen = signal(false);
+  readonly guideOpen = signal(false);
   readonly viewportTall = signal(true);
   readonly restartConfirm = signal(false);
   readonly deltaMap = signal<Record<string, number>>({});
