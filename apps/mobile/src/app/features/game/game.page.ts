@@ -126,7 +126,6 @@ const GLOW: Record<ManaColor, string> = {
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="undo()" aria-label="Undo">
             <crown-icon name="Undo2" [size]="18"></crown-icon>
           </button>
-          <button class="crown-btn-primary flex-[2.2] py-3 text-[11px] uppercase tracking-widest" (click)="turn()">Pass turn</button>
           <button class="crown-btn flex-[1] py-3 flex items-center justify-center" (click)="askRestart()" aria-label="Reiniciar partida">
             <crown-icon name="RotateCw" [size]="18"></crown-icon>
           </button>
